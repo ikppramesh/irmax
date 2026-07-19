@@ -70,7 +70,19 @@ object VideoCropper {
             .setBackgroundFrameAnchor(0.85f, -0.85f)
             .build()
         val overlay = BitmapOverlay.createStaticBitmapOverlay(scaledWatermark, overlaySettings)
-        val overlayEffect = OverlayEffect(listOf(overlay))
+
+        // Bottom-left ratio tag (e.g. "1.43:1"), mirroring the watermark's anchor/margin/alpha so
+        // the two read as a matching pair rather than differently-scaled afterthoughts.
+        val ratioLabelWidth = (cropW * RATIO_LABEL_WIDTH_FRACTION).toInt().coerceAtLeast(1)
+        val ratioLabelBitmap = ratioLabelBitmap(ratio.label, ratioLabelWidth)
+        val ratioLabelSettings = OverlaySettings.Builder()
+            .setAlphaScale(WATERMARK_ALPHA)
+            .setOverlayFrameAnchor(-1f, -1f)
+            .setBackgroundFrameAnchor(-0.85f, -0.85f)
+            .build()
+        val ratioLabelOverlay = BitmapOverlay.createStaticBitmapOverlay(ratioLabelBitmap, ratioLabelSettings)
+
+        val overlayEffect = OverlayEffect(listOf(overlay, ratioLabelOverlay))
 
         val videoEffects = buildList<Effect> {
             add(Presentation.createForWidthAndHeight(cropW, cropH, Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP))

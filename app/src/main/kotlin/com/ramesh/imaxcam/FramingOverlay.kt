@@ -11,6 +11,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -34,7 +35,7 @@ private val GRID_COLOR = Color.White.copy(alpha = 0.5f)
  * overlay even gets a chance to show it.
  */
 @Composable
-fun FramingOverlay(captureRatio: Double, targetRatio: Float, modifier: Modifier = Modifier) {
+fun FramingOverlay(captureRatio: Double, targetRatio: Float, ratioLabel: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val watermark = remember {
         BitmapFactory.decodeResource(context.resources, R.drawable.irmax_watermark).asImageBitmap()
@@ -108,5 +109,21 @@ fun FramingOverlay(captureRatio: Double, targetRatio: Float, modifier: Modifier 
             dstSize = IntSize(wmWidth.toInt(), wmHeight.toInt()),
             alpha = WATERMARK_ALPHA
         )
+
+        // Bottom-left ratio tag, mirroring the watermark's margin/alpha so the live guide matches
+        // what PhotoCropper/VideoCropper actually bake in. Sized by WIDTH (its own fraction, not the
+        // watermark's) since matching the watermark's height made the text visibly wider than the
+        // compact logo at the same nominal size.
+        val labelPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            color = android.graphics.Color.WHITE
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            alpha = (WATERMARK_ALPHA * 255).toInt()
+            textSize = 100f
+        }
+        val labelTargetWidth = guideW * RATIO_LABEL_WIDTH_FRACTION
+        val probeWidth = labelPaint.measureText(ratioLabel)
+        labelPaint.textSize = labelTargetWidth * (100f / probeWidth)
+        val labelBaselineY = guideTop + guideH - margin - labelPaint.fontMetrics.descent
+        drawContext.canvas.nativeCanvas.drawText(ratioLabel, guideLeft + margin, labelBaselineY, labelPaint)
     }
 }

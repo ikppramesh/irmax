@@ -63,6 +63,10 @@ object PhotoCropper {
         val watermarkPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { alpha = (WATERMARK_ALPHA * 255).toInt() }
         canvas.drawBitmap(watermark, null, dst, watermarkPaint)
 
+        val ratioLabelWidth = (filtered.width * RATIO_LABEL_WIDTH_FRACTION).toInt().coerceAtLeast(1)
+        val ratioLabel = ratioLabelBitmap(ratio.label, ratioLabelWidth)
+        canvas.drawBitmap(ratioLabel, margin, filtered.height - ratioLabel.height - margin, watermarkPaint)
+
         FileOutputStream(outputFile).use { out ->
             filtered.compress(Bitmap.CompressFormat.JPEG, 100, out)
         }

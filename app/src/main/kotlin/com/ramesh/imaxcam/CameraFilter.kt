@@ -33,7 +33,14 @@ fun androidColorMatrixFor(filter: CameraFilter): ColorMatrix = when (filter) {
     )
 }
 
-/** Media3-side matrix (baked into recorded video), same transforms expressed as a 4x4 RGBA matrix. */
+/**
+ * Media3-side matrix (baked into recorded video), same transforms as [androidColorMatrixFor] but
+ * expressed as a 4x4 RGBA matrix in COLUMN-MAJOR order (the GL/uniform-mat4 convention Media3's
+ * `RgbMatrix` expects) — NOT Android's own row-major `ColorMatrix` layout. Getting this backwards
+ * doesn't just look "off": for a desaturation matrix specifically it makes every output channel
+ * take on the green weight (0.715), which is exactly why the wrong layout showed up as a strong
+ * green tint rather than a subtle color shift.
+ */
 @UnstableApi
 fun media3RgbMatrixFor(filter: CameraFilter): RgbMatrix =
     RgbMatrix { _, _ ->
@@ -45,33 +52,25 @@ fun media3RgbMatrixFor(filter: CameraFilter): RgbMatrix =
                 0f, 0f, 0f, 1f,
             )
             CameraFilter.MONO -> floatArrayOf(
-                LUMA_R, LUMA_G, LUMA_B, 0f,
-                LUMA_R, LUMA_G, LUMA_B, 0f,
-                LUMA_R, LUMA_G, LUMA_B, 0f,
+                LUMA_R, LUMA_R, LUMA_R, 0f,
+                LUMA_G, LUMA_G, LUMA_G, 0f,
+                LUMA_B, LUMA_B, LUMA_B, 0f,
                 0f, 0f, 0f, 1f,
             )
             CameraFilter.VIVID -> {
                 val s = VIVID_SATURATION
-                val rr = LUMA_R * (1 - s) + s
-                val rg = LUMA_G * (1 - s)
-                val rb = LUMA_B * (1 - s)
-                val gr = LUMA_R * (1 - s)
-                val gg = LUMA_G * (1 - s) + s
-                val gb = LUMA_B * (1 - s)
-                val br = LUMA_R * (1 - s)
-                val bg = LUMA_G * (1 - s)
-                val bb = LUMA_B * (1 - s) + s
+                val k = 1 - s
                 floatArrayOf(
-                    rr, rg, rb, 0f,
-                    gr, gg, gb, 0f,
-                    br, bg, bb, 0f,
+                    LUMA_R * k + s, LUMA_R * k, LUMA_R * k, 0f,
+                    LUMA_G * k, LUMA_G * k + s, LUMA_G * k, 0f,
+                    LUMA_B * k, LUMA_B * k, LUMA_B * k + s, 0f,
                     0f, 0f, 0f, 1f,
                 )
             }
             CameraFilter.SEPIA -> floatArrayOf(
-                0.393f, 0.769f, 0.189f, 0f,
-                0.349f, 0.686f, 0.168f, 0f,
-                0.272f, 0.534f, 0.131f, 0f,
+                0.393f, 0.349f, 0.272f, 0f,
+                0.769f, 0.686f, 0.534f, 0f,
+                0.189f, 0.168f, 0.131f, 0f,
                 0f, 0f, 0f, 1f,
             )
         }

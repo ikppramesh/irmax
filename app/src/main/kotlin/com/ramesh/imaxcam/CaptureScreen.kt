@@ -157,7 +157,12 @@ fun CaptureScreen(onShowCapabilities: () -> Unit) {
         }
 
         selectedResolution?.let { res ->
-            FramingOverlay(captureRatio = res.ratio, targetRatio = selectedRatio.value, modifier = Modifier.fillMaxSize())
+            FramingOverlay(
+                captureRatio = res.ratio,
+                targetRatio = selectedRatio.value,
+                ratioLabel = selectedRatio.label,
+                modifier = Modifier.fillMaxSize()
+            )
         }
 
         LevelIndicator(rollDegrees = rollDegrees, modifier = Modifier.fillMaxSize())
