@@ -12,7 +12,9 @@ fun videoResolutionChoices(report: CameraReport): List<ResolutionChoice> =
     report.videoQualities.map { ResolutionChoice("${it.label}  (${it.size.width}x${it.size.height})", it.size) }
 
 /** Derives a human lens label from focal length rank among the cameras actually found on this device — never hardcoded. */
-fun lensLabel(all: List<CameraReport>, report: CameraReport): String {
+fun lensLabel(all: List<CameraReport>, report: CameraReport, facing: Int): String {
+    val frontLabel = if (all.size <= 1) "Front" else "Front ${all.indexOf(report) + 1}"
+    if (facing == android.hardware.camera2.CameraCharacteristics.LENS_FACING_FRONT) return frontLabel
     if (all.size <= 1) return "Main"
     val focals = all.mapNotNull { it.focalLengthMm }
     if (focals.isEmpty() || report.focalLengthMm == null) return "Cam ${report.cameraId}"

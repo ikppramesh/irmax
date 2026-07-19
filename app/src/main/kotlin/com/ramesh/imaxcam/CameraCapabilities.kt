@@ -30,10 +30,10 @@ data class CameraReport(
 }
 
 /**
- * Queries the real device at runtime for every back-facing camera (a Fold-class phone exposes
- * separate ids for main/ultrawide/telephoto/etc, not just one) and every supported still/video
- * size on each. Never hardcodes assumed Fold7 specs — Samsung sometimes gates its
- * highest-resolution modes (200MP stills, 8K video) behind vendor-only Camera2 extensions, and
+ * Queries the real device at runtime for every camera facing a given direction (a Fold-class phone
+ * exposes separate ids for main/ultrawide/telephoto/etc on the back, not just one) and every
+ * supported still/video size on each. Never hardcodes assumed Fold7 specs — Samsung sometimes gates
+ * its highest-resolution modes (200MP stills, 8K video) behind vendor-only Camera2 extensions, and
  * which physical lens is even "the main one" varies by camera id, so both have to be discovered
  * from CameraCharacteristics rather than assumed.
  */
@@ -52,23 +52,27 @@ object CameraCapabilities {
         CamcorderProfile.QUALITY_480P to "480p",
     )
 
-    /** All back-facing cameras, sorted with the highest-resolution still sensor first. */
-    fun probeBackCameras(context: Context): List<CameraReport> {
+    /**
+     * All cameras facing [facing] (one of `CameraCharacteristics.LENS_FACING_*` — that constant
+     * space is numerically identical to CameraX's `CameraSelector.LENS_FACING_*`, so the same Int
+     * is used across both layers without translation), sorted with the highest-resolution still
+     * sensor first.
+     */
+    fun probeCameras(context: Context, facing: Int): List<CameraReport> {
         val manager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
-        val backIds = manager.cameraIdList.filter { id ->
-            manager.getCameraCharacteristics(id)
-                .get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK
+        val ids = manager.cameraIdList.filter { id ->
+            manager.getCameraCharacteristics(id).get(CameraCharacteristics.LENS_FACING) == facing
         }
-        if (backIds.isEmpty()) {
-            Log.e(TAG, "No back-facing camera found")
+        if (ids.isEmpty()) {
+            Log.e(TAG, "No camera found facing $facing")
             return emptyList()
         }
 
-        val reports = backIds.map { id -> probeOne(manager, id) }
+        val reports = ids.map { id -> probeOne(manager, id) }
             .sortedByDescending { it.maxStill?.let { s -> s.width.toLong() * s.height } ?: 0L }
 
-        Log.i(TAG, "Found ${reports.size} back-facing camera id(s): ${reports.joinToString { it.cameraId }}")
+        Log.i(TAG, "Found ${reports.size} camera id(s) facing $facing: ${reports.joinToString { it.cameraId }}")
         reports.forEach { r ->
             Log.i(TAG, "Camera id=${r.cameraId} focalLength=${r.focalLengthMm}mm maxStill=${r.maxStill} maxVideo=${r.maxVideo?.label}=${r.maxVideo?.size}")
             Log.i(TAG, "  Still sizes (${r.stillSizes.size}): ${r.stillSizes.joinToString()}")

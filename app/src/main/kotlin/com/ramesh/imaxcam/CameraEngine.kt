@@ -5,6 +5,7 @@ import android.util.Log
 import android.util.Size
 import androidx.camera.camera2.interop.Camera2CameraInfo
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
@@ -35,17 +36,21 @@ private fun qualityForLabel(label: String): Quality = when (label) {
 class CameraEngine(private val context: Context) {
 
     /**
-     * Binds preview + still capture to a specific Camera2 camera id (from [CameraCapabilities]),
-     * or the default back camera if null/not found. [targetStillSize] pins ImageCapture to the
-     * resolution picked in the UI; CameraX snaps to the closest size the HAL actually supports.
+     * Binds preview + still capture to a specific Camera2 camera id (from [CameraCapabilities]) on
+     * the given [facing], or the default camera for that facing if the id isn't found.
+     * [targetStillSize] pins ImageCapture to the resolution picked in the UI; CameraX snaps to the
+     * closest size the HAL actually supports. [onCameraReady] exposes the bound [Camera] so the UI
+     * can drive torch control (`camera.cameraControl.enableTorch(...)`).
      */
     @OptIn(ExperimentalCamera2Interop::class)
     fun bindPhoto(
         lifecycleOwner: LifecycleOwner,
         previewView: PreviewView,
         cameraId: String? = null,
+        facing: Int = CameraSelector.LENS_FACING_BACK,
         targetStillSize: CaptureSize? = null,
         onImageCaptureReady: (ImageCapture) -> Unit = {},
+        onCameraReady: (Camera) -> Unit = {},
     ) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener({
@@ -70,19 +75,22 @@ class CameraEngine(private val context: Context) {
                 )
             }
             val imageCapture = imageCaptureBuilder.build()
-            val selector = selectorFor(cameraId)
+            val selector = selectorFor(cameraId, facing)
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(lifecycleOwner, selector, preview, imageCapture)
+                val camera = cameraProvider.bindToLifecycle(lifecycleOwner, selector, preview, imageCapture)
                 onImageCaptureReady(imageCapture)
-                Log.i(TAG, "Preview+photo bound to camera id=${cameraId ?: "default back"}, targetStill=$targetStillSize")
+                onCameraReady(camera)
+                Log.i(TAG, "Preview+photo bound to camera id=${cameraId ?: "default"} facing=$facing, targetStill=$targetStillSize")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to bind camera for id=$cameraId, falling back to default", e)
                 runCatching {
                     cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
+                    val fallbackSelector = defaultSelectorFor(facing)
+                    val camera = cameraProvider.bindToLifecycle(lifecycleOwner, fallbackSelector, preview, imageCapture)
                     onImageCaptureReady(imageCapture)
+                    onCameraReady(camera)
                 }
             }
         }, ContextCompat.getMainExecutor(context))
@@ -94,8 +102,10 @@ class CameraEngine(private val context: Context) {
         lifecycleOwner: LifecycleOwner,
         previewView: PreviewView,
         cameraId: String? = null,
+        facing: Int = CameraSelector.LENS_FACING_BACK,
         targetQualityLabel: String? = null,
         onVideoCaptureReady: (VideoCapture<Recorder>) -> Unit = {},
+        onCameraReady: (Camera) -> Unit = {},
     ) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener({
@@ -111,35 +121,46 @@ class CameraEngine(private val context: Context) {
                     QualitySelector.from(quality, FallbackStrategy.lowerQualityOrHigherThan(quality))
                 )
                 .build()
+            val selector = selectorFor(cameraId, facing)
+            // Deliberately plain SDR: requesting HLG/HDR dynamic range on this device destabilized
+            // the camera HAL (triggered repeated vendor extension crashes) and produced corrupt,
+            // near-empty Media3 Transformer output. Not worth it for a tier that wasn't even real
+            // Dolby Vision to begin with (Samsung gates that behind its own camera app).
             val videoCapture = VideoCapture.withOutput(recorder)
-            val selector = selectorFor(cameraId)
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(lifecycleOwner, selector, preview, videoCapture)
+                val camera = cameraProvider.bindToLifecycle(lifecycleOwner, selector, preview, videoCapture)
                 onVideoCaptureReady(videoCapture)
-                Log.i(TAG, "Preview+video bound to camera id=${cameraId ?: "default back"}, quality=$quality")
+                onCameraReady(camera)
+                Log.i(TAG, "Preview+video bound to camera id=${cameraId ?: "default"} facing=$facing, quality=$quality")
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to bind video for id=$cameraId, falling back to default", e)
                 runCatching {
                     cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, videoCapture)
+                    val fallbackSelector = defaultSelectorFor(facing)
+                    val camera = cameraProvider.bindToLifecycle(lifecycleOwner, fallbackSelector, preview, videoCapture)
                     onVideoCaptureReady(videoCapture)
+                    onCameraReady(camera)
                 }
             }
         }, ContextCompat.getMainExecutor(context))
     }
 
     @OptIn(ExperimentalCamera2Interop::class)
-    private fun selectorFor(cameraId: String?): CameraSelector =
+    private fun selectorFor(cameraId: String?, facing: Int): CameraSelector =
         if (cameraId == null) {
-            CameraSelector.DEFAULT_BACK_CAMERA
+            defaultSelectorFor(facing)
         } else {
             CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .requireLensFacing(facing)
                 .addCameraFilter { cameraInfos ->
                     cameraInfos.filter { Camera2CameraInfo.from(it).cameraId == cameraId }
                 }
                 .build()
         }
+
+    private fun defaultSelectorFor(facing: Int): CameraSelector =
+        if (facing == CameraSelector.LENS_FACING_FRONT) CameraSelector.DEFAULT_FRONT_CAMERA
+        else CameraSelector.DEFAULT_BACK_CAMERA
 }

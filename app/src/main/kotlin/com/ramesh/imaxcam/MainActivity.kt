@@ -2,6 +2,7 @@ package com.ramesh.imaxcam
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,7 +32,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 
+// Blocking — the app can't function without these.
 private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+
+// Requested alongside the required ones but never blocks entry — export progress notifications
+// are a nice-to-have, not core functionality, and POST_NOTIFICATIONS only exists on API 33+.
+private val OPTIONAL_PERMISSIONS =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) arrayOf(Manifest.permission.POST_NOTIFICATIONS)
+    else emptyArray()
 
 class MainActivity : ComponentActivity() {
 
@@ -46,7 +55,18 @@ class MainActivity : ComponentActivity() {
             var granted by remember { mutableStateOf(hasAllPermissions()) }
 
             val permissionLauncher = rememberLauncherForRequiredPermissions { results ->
-                granted = results.values.all { it }
+                granted = REQUIRED_PERMISSIONS.all { results[it] == true }
+            }
+
+            // Requested independently of the blocking camera/mic flow — if those were already
+            // granted from a previous install, the blocking screen below never shows, so this is
+            // the only place notifications would otherwise get asked for.
+            val optionalLauncher = rememberLauncherForRequiredPermissions { }
+            LaunchedEffect(Unit) {
+                val missing = OPTIONAL_PERMISSIONS.filter {
+                    ContextCompat.checkSelfPermission(this@MainActivity, it) != PackageManager.PERMISSION_GRANTED
+                }
+                if (missing.isNotEmpty()) optionalLauncher(missing)
             }
 
             var showCapabilities by remember { mutableStateOf(false) }
@@ -54,7 +74,7 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = Color.Black) {
                     if (!granted) {
-                        PermissionRequestScreen(onRequest = { permissionLauncher() })
+                        PermissionRequestScreen(onRequest = { permissionLauncher((REQUIRED_PERMISSIONS + OPTIONAL_PERMISSIONS).toList()) })
                     } else if (showCapabilities) {
                         CapabilitiesScreen(onBack = { showCapabilities = false })
                     } else {
@@ -67,12 +87,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun rememberLauncherForRequiredPermissions(onResult: (Map<String, Boolean>) -> Unit): () -> Unit {
+private fun rememberLauncherForRequiredPermissions(onResult: (Map<String, Boolean>) -> Unit): (List<String>) -> Unit {
     val launcher = androidx.activity.compose.rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
         onResult
     )
-    return { launcher.launch(REQUIRED_PERMISSIONS) }
+    return { permissions -> launcher.launch(permissions.toTypedArray()) }
 }
 
 @Composable

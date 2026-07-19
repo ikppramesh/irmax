@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import android.hardware.camera2.CameraCharacteristics
 
 @Composable
 fun CapabilitiesScreen(onBack: () -> Unit) {
@@ -27,13 +28,14 @@ fun CapabilitiesScreen(onBack: () -> Unit) {
     var probed by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        reports = CameraCapabilities.probeBackCameras(context)
+        reports = CameraCapabilities.probeCameras(context, CameraCharacteristics.LENS_FACING_BACK) +
+            CameraCapabilities.probeCameras(context, CameraCharacteristics.LENS_FACING_FRONT)
         probed = true
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-            Text("Back-facing cameras (highest resolution first)", color = Color.White)
+            Text("Back- and front-facing cameras (highest resolution first)", color = Color.White)
             Button(onClick = onBack, modifier = Modifier.padding(vertical = 8.dp)) {
                 Text("Back to viewfinder")
             }

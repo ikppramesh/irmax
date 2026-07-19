@@ -1,34 +1,45 @@
 package com.ramesh.imaxcam
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
-
-/** The true full-frame 15/70 IMAX film ratio. */
-const val IMAX_143_RATIO = 1.43f
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 
 private val DIM_COLOR = Color.Black.copy(alpha = 0.55f)
 private val GRID_COLOR = Color.White.copy(alpha = 0.5f)
 
 /**
- * Draws the region of the current capture that will survive a crop to 1.43:1.
+ * Draws the region of the current capture that will survive a crop to [targetRatio], plus a
+ * bottom-right watermark preview sized relative to that guide box — so what you see while framing
+ * a shot is the same relative size as what [PhotoCropper]/[VideoCropper] actually bakes in, instead
+ * of a fixed on-screen size that would look bigger or smaller depending on the current ratio/crop.
  *
- * The math is generic on purpose: a 4:3 still (ratio 1.333, narrower than 1.43) needs its
- * top/bottom trimmed to reach 1.43:1, while a 16:9 video (ratio 1.778, wider than 1.43) needs
- * its left/right trimmed instead. [captureRatio] is whatever the actually-selected size reports,
- * so this handles both directions without assuming which one applies.
+ * The crop math is generic on purpose: a 4:3 still (ratio 1.333, narrower than either IMAX ratio)
+ * needs its top/bottom trimmed, while a 16:9 video (ratio 1.778) needs its left/right trimmed
+ * instead — which direction applies depends on both [captureRatio] and [targetRatio], so both are
+ * taken as live values rather than assumed.
  *
  * PreviewView must be set to FIT_CENTER (not the CameraX default FILL_CENTER) for this to be a
  * true WYSIWYG guide — otherwise the widget already crops part of the sensor frame before this
  * overlay even gets a chance to show it.
  */
 @Composable
-fun FramingOverlay(captureRatio: Double, modifier: Modifier = Modifier) {
+fun FramingOverlay(captureRatio: Double, targetRatio: Float, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val watermark = remember {
+        BitmapFactory.decodeResource(context.resources, R.drawable.irmax_watermark).asImageBitmap()
+    }
+
     Canvas(modifier = modifier.fillMaxSize()) {
         val viewW = size.width
         val viewH = size.height
@@ -48,8 +59,8 @@ fun FramingOverlay(captureRatio: Double, modifier: Modifier = Modifier) {
         val sensorLeft = (viewW - sensorW) / 2f
         val sensorTop = (viewH - sensorH) / 2f
 
-        // The 1.43:1 guide box within that sensor frame — same math the actual crop uses.
-        val crop = imaxCropRect(sensorW, sensorH)
+        // The IMAX guide box within that sensor frame — same math the actual crop uses.
+        val crop = imaxCropRect(sensorW, sensorH, targetRatio)
         val guideW = crop.width
         val guideH = crop.height
         val guideLeft = sensorLeft + crop.left
@@ -83,5 +94,19 @@ fun FramingOverlay(captureRatio: Double, modifier: Modifier = Modifier) {
             val y = guideTop + thirdH * i
             drawLine(GRID_COLOR, Offset(guideLeft, y), Offset(guideLeft + guideW, y), strokeWidth = 1.5f)
         }
+
+        // Watermark preview, sized/positioned identically (relative to the guide box) to the real bake-in.
+        val wmWidth = guideW * WATERMARK_WIDTH_FRACTION
+        val wmHeight = wmWidth * watermark.height / watermark.width
+        val margin = guideW * WATERMARK_MARGIN_FRACTION
+        drawImage(
+            image = watermark,
+            dstOffset = IntOffset(
+                (guideLeft + guideW - wmWidth - margin).toInt(),
+                (guideTop + guideH - wmHeight - margin).toInt()
+            ),
+            dstSize = IntSize(wmWidth.toInt(), wmHeight.toInt()),
+            alpha = WATERMARK_ALPHA
+        )
     }
 }

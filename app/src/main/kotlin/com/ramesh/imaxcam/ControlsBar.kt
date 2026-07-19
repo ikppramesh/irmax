@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
@@ -15,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import android.util.Log
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -56,10 +54,7 @@ fun ModeToggle(mode: CaptureMode, onChange: (CaptureMode) -> Unit) {
                 color = if (m == mode) Color.Black else Color.White,
                 modifier = Modifier
                     .background(if (m == mode) Color.White else Color.Transparent, RoundedCornerShape(6.dp))
-                    .clickable {
-                        Log.i("IRMAX-Debug", "ModeToggle clicked: $m")
-                        onChange(m)
-                    }
+                    .clickable { onChange(m) }
                     .padding(horizontal = 10.dp, vertical = 6.dp)
             )
         }
@@ -67,28 +62,21 @@ fun ModeToggle(mode: CaptureMode, onChange: (CaptureMode) -> Unit) {
 }
 
 @Composable
-fun ControlsBar(
-    lensLabel: String,
-    lensOptions: List<Pair<String, String>>,
-    onLensSelect: (String) -> Unit,
-    resolutionLabel: String,
-    resolutionOptions: List<Pair<String, CaptureSize>>,
-    onResolutionSelect: (CaptureSize) -> Unit,
-    mode: CaptureMode,
-    onModeChange: (CaptureMode) -> Unit,
-) {
+fun RatioToggle(ratio: ImaxRatio, onChange: (ImaxRatio) -> Unit) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Black.copy(alpha = 0.35f))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
+            .padding(2.dp)
     ) {
-        LabeledDropdown(label = "Lens: $lensLabel", options = lensOptions, onSelect = onLensSelect)
-        Box(modifier = Modifier.padding(start = 8.dp)) {
-            LabeledDropdown(label = "Res: $resolutionLabel", options = resolutionOptions, onSelect = onResolutionSelect)
-        }
-        Box(modifier = Modifier.padding(start = 8.dp)) {
-            ModeToggle(mode = mode, onChange = onModeChange)
+        ImaxRatio.entries.forEach { r ->
+            Text(
+                text = r.label,
+                color = if (r == ratio) Color.Black else Color.White,
+                modifier = Modifier
+                    .background(if (r == ratio) Color.White else Color.Transparent, RoundedCornerShape(6.dp))
+                    .clickable { onChange(r) }
+                    .padding(horizontal = 10.dp, vertical = 6.dp)
+            )
         }
     }
 }
