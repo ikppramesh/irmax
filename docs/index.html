@@ -103,9 +103,13 @@
   }
 
   .stage {
+    /* Bounds match the tallest ratio in FORMATS (Movietone, 1.19:1) — the
+       "full negative" every other ratio crops down from. This is a
+       different number from the default *selected* crop (--ratio, below),
+       which is IMAX GT at 1.43:1. */
     position: relative;
     overflow: hidden;
-    aspect-ratio: 1.43;
+    aspect-ratio: 1.19;
     background: var(--mask);
     border: 1px solid var(--rule);
     border-radius: 3px;
@@ -298,6 +302,23 @@
     max-width: 60ch;
   }
 
+  /* ---------- callout ---------- */
+
+  .callout {
+    margin-top: 28px;
+    padding: 16px 18px;
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--accent-dim);
+    border-radius: 3px;
+    background: var(--bg-raised);
+  }
+  .callout p {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--ink-dim);
+  }
+  .callout strong { color: var(--ink); }
+
   /* ---------- footer ---------- */
 
   .foot {
@@ -320,9 +341,9 @@
     <p class="eyebrow">Format comparison · reference reel</p>
     <h1>Explore Premium Formats</h1>
     <p class="lede">
-      One full-frame negative, cropped five different ways. Select a format to see how
-      much of the picture survives the trim — and why IMAX's own 1.43:1 frame is the
-      tallest starting point in the room.
+      One full-frame negative, cropped eleven different ways across a century of cinema —
+      from Movietone's boxy 1.19:1 in the late 1920s to Ultra Panavision 70's sweeping
+      2.76:1. Select a format to see how much of the picture survives the trim.
     </p>
   </header>
 
@@ -356,7 +377,7 @@
         </div>
         <div>
           <dt>Picture height retained</dt>
-          <dd id="statHeight">100%</dd>
+          <dd id="statHeight">83%</dd>
         </div>
         <div>
           <dt>Gauge</dt>
@@ -370,10 +391,20 @@
     </div>
   </section>
 
+  <aside class="callout">
+    <p>
+      <strong>Not every premium format is a ratio.</strong> Disney's
+      <strong>Infinity Vision</strong> certification (2026) sets a minimum 50ft screen width,
+      requires laser projection, and 7.1-channel-plus immersive audio — but unlike IMAX, it
+      has no fixed aspect ratio requirement at all. It's a performance target, not a frame
+      shape, which is why it doesn't get a tab above.
+    </p>
+  </aside>
+
   <footer class="foot">
     <p>
       The IRMAX Android app frames and crops live for <strong>1.43:1</strong> and
-      <strong>1.90:1</strong> in the viewfinder — <a href="../README.md">see the app →</a>
+      <strong>1.90:1</strong> in the viewfinder — <a href="https://github.com/ikppramesh/irmax">see the app →</a>
     </p>
   </footer>
 
@@ -385,12 +416,44 @@
 
   var FORMATS = [
     {
+      id: "movietone",
+      ratio: 1.19,
+      name: "Movietone (1.19:1)",
+      short: "Movietone",
+      gauge: "35mm negative · 4-perf, optical soundtrack full-frame",
+      desc: "The tallest ratio in regular commercial use — an early-sound format from the late 1920s, when adding an optical soundtrack to the 35mm frame narrowed the image, before the Academy aperture standardized a wider compromise in 1932."
+    },
+    {
+      id: "academy",
+      ratio: 1.37,
+      name: "Academy Ratio (1.37:1)",
+      short: "Academy",
+      gauge: "35mm negative · 4-perf, Academy aperture",
+      desc: "The standard sound-era theatrical ratio from 1932 into the 1950s widescreen transition — the frame behind nearly every classic Hollywood film, from Casablanca to Citizen Kane, before CinemaScope changed the shape of the screen."
+    },
+    {
       id: "imax-gt",
       ratio: 1.43,
       name: "IMAX GT (15/70)",
       short: "IMAX GT",
       gauge: "65mm negative · 15-perf",
       desc: "The full IMAX negative — 65mm film running horizontally through the camera at 15 perforations per frame. The largest and highest-resolution photochemical format ever used in commercial cinema, reserved for a small number of purpose-built GT screens worldwide."
+    },
+    {
+      id: "european-flat",
+      ratio: 1.66,
+      name: "European Flat (1.66:1)",
+      short: "Euro Flat",
+      gauge: "35mm negative · 4-perf, European aperture",
+      desc: "A softer widescreen compromise than the American 1.85:1, historically favored across continental Europe and by directors including Stanley Kubrick and Wes Anderson for its slightly boxier, more classical feel."
+    },
+    {
+      id: "35mm-flat",
+      ratio: 1.85,
+      name: "35mm Flat",
+      short: "35mm Flat",
+      gauge: "35mm negative · 4-perf, spherical",
+      desc: "The default US theatrical ratio. Shot spherically on standard 4-perforation 35mm and matted top and bottom in the projector — the frame most films are still finished for today."
     },
     {
       id: "imax-digital",
@@ -409,24 +472,41 @@
       desc: "A large-format 65mm negative shot at 5 perforations per frame — the roadshow format behind widescreen epics from Lawrence of Arabia to The Hateful Eight, prized for its clarity and scale without requiring a purpose-built IMAX auditorium."
     },
     {
-      id: "35mm-flat",
-      ratio: 1.85,
-      name: "35mm Flat",
-      short: "35mm Flat",
-      gauge: "35mm negative · 4-perf, spherical",
-      desc: "The default US theatrical ratio. Shot spherically on standard 4-perforation 35mm and matted top and bottom in the projector — the frame most films are still finished for today."
-    },
-    {
       id: "35mm-scope",
       ratio: 2.39,
       name: "35mm Scope",
       short: "35mm Scope",
       gauge: "35mm negative · 4-perf, anamorphic 2×",
       desc: "A standard 35mm frame shot through an anamorphic lens that squeezes a wide field of view horizontally onto the negative, then unsqueezes it again in projection — the format behind the widest, most “cinematic” theatrical image."
+    },
+    {
+      id: "cinemascope",
+      ratio: 2.55,
+      name: "Original CinemaScope (2.55:1)",
+      short: "CinemaScope",
+      gauge: "35mm negative · 4-perf, anamorphic 2×, magnetic stereo",
+      desc: "The ratio 20th Century Fox launched CinemaScope with in 1953. Once a magnetic-stereo soundtrack was squeezed onto prints later that decade, the image narrowed to the 2.35:1 that became the pre-1970s scope standard."
+    },
+    {
+      id: "cinerama",
+      ratio: 2.59,
+      name: "Cinerama (2.59:1)",
+      short: "Cinerama",
+      gauge: "3× 35mm negative, deeply curved screen",
+      desc: "Three synchronized 35mm cameras and projectors stitched into one deeply curved, wraparound screen — the most physically immersive widescreen process of the 1950s, and a direct ancestor of today's giant-screen formats."
+    },
+    {
+      id: "ultra-panavision",
+      ratio: 2.76,
+      name: "Ultra Panavision 70 (2.76:1)",
+      short: "Ultra Panavision",
+      gauge: "65mm negative · 5-perf, anamorphic 1.25×",
+      desc: "A 1.25× anamorphic squeeze added to a 65mm negative specifically to fill Cinerama's huge curved screens from a single projector — the widest ratio in regular theatrical use, revived by Quentin Tarantino for The Hateful Eight in 2015."
     }
   ];
 
-  var FULL_RATIO = FORMATS[0].ratio; // IMAX GT — the tallest frame, everything else crops down from it
+  var DEFAULT_ID = "imax-gt"; // what the IRMAX app itself shoots — kept as the default tab even though it's no longer the tallest entry
+  var FULL_RATIO = Math.min.apply(null, FORMATS.map(function (f) { return f.ratio; }));
 
   var stage = document.getElementById("stage");
   var strip = document.getElementById("formatStrip");
@@ -438,13 +518,14 @@
   FORMATS.forEach(function (f, i) { frameCounters[f.id] = frameBase + i * 137; });
 
   function buildStrip() {
-    FORMATS.forEach(function (f, i) {
+    FORMATS.forEach(function (f) {
       var btn = document.createElement("button");
       btn.type = "button";
       btn.className = "fmt-btn";
+      var isDefault = f.id === DEFAULT_ID;
       btn.setAttribute("role", "radio");
-      btn.setAttribute("aria-checked", i === 0 ? "true" : "false");
-      btn.setAttribute("tabindex", i === 0 ? "0" : "-1");
+      btn.setAttribute("aria-checked", isDefault ? "true" : "false");
+      btn.setAttribute("tabindex", isDefault ? "0" : "-1");
       btn.dataset.id = f.id;
 
       var ratioEl = document.createElement("span");
@@ -589,7 +670,7 @@
   buildStrip();
   drawScene();
   buildGrainTile();
-  document.getElementById("specDesc").textContent = FORMATS[0].desc;
+  select(DEFAULT_ID, strip.querySelector('.fmt-btn[data-id="' + DEFAULT_ID + '"]'));
   tickFrames();
 })();
 </script>
