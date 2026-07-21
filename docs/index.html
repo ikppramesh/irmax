@@ -44,14 +44,14 @@
   }
 
   .page {
-    max-width: 900px;
+    max-width: 1140px;
     margin: 0 auto;
-    padding: clamp(28px, 6vw, 64px) clamp(18px, 4vw, 32px) 72px;
+    padding: clamp(18px, 3vw, 32px) clamp(18px, 4vw, 32px) 56px;
   }
 
   /* ---------- masthead ---------- */
 
-  .masthead { margin-bottom: clamp(20px, 4vw, 32px); }
+  .masthead { margin-bottom: 14px; }
 
   .wordmark {
     font-family: var(--font-display);
@@ -67,23 +67,23 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ink-faint);
-    margin: 20px 0 10px;
+    margin: 10px 0 6px;
   }
 
   h1 {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: clamp(1.9rem, 1.3rem + 2.3vw, 2.9rem);
+    font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem);
     letter-spacing: -0.02em;
-    line-height: 1.06;
-    margin: 0 0 14px;
+    line-height: 1.1;
+    margin: 0 0 6px;
     text-wrap: balance;
   }
 
   .lede {
-    font-size: 1.0625rem;
+    font-size: 0.9375rem;
     color: var(--ink-dim);
-    max-width: 58ch;
+    max-width: 72ch;
     margin: 0;
   }
 
@@ -91,7 +91,7 @@
 
   .tabs {
     display: flex;
-    margin-top: clamp(24px, 5vw, 36px);
+    margin-top: 16px;
     border-bottom: 1px solid var(--rule);
   }
 
@@ -123,15 +123,35 @@
     border-bottom-color: var(--accent);
   }
 
-  .panel { margin-top: clamp(24px, 5vw, 36px); }
+  .panel { margin-top: 18px; }
+
+  /* ---------- comparator layout: format list left, viewer right ---------- */
+
+  .comparator {
+    display: grid;
+    grid-template-columns: 230px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  @media (max-width: 760px) {
+    .comparator { grid-template-columns: 1fr; }
+  }
+
+  .viewer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
 
   /* ---------- test-your-own panel ---------- */
 
   .test-note {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     color: var(--ink-dim);
-    max-width: 62ch;
-    margin: 0 0 18px;
+    max-width: 68ch;
+    margin: 0 0 12px;
   }
 
   .upload-row {
@@ -284,22 +304,13 @@
   }
 
   .rail::after {
-    /* faint laser-alignment scan traveling the rail */
+    /* static laser-alignment mark, no longer animated */
     content: "";
     position: absolute;
     left: 0; right: 0;
+    top: 30%;
     height: 40%;
     background: linear-gradient(180deg, transparent, rgba(47, 216, 255, 0.4), transparent);
-    animation: scan-rail 3.2s ease-in-out infinite;
-  }
-
-  @keyframes scan-rail {
-    0%, 100% { top: -40%; }
-    50% { top: 100%; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .rail::after { animation: none; top: 30%; }
   }
 
   .stage {
@@ -313,6 +324,8 @@
     background: var(--mask);
     border: 1px solid var(--rule);
     border-radius: 3px;
+    /* screen light spilling into a dark auditorium */
+    box-shadow: 0 0 70px 12px rgba(47, 216, 255, 0.07), 0 24px 60px rgba(0, 0, 0, 0.65);
   }
 
   .stage video, .stage iframe {
@@ -327,11 +340,11 @@
   }
 
   .stage::after {
-    /* cool screen-glow vignette */
+    /* dark-auditorium vignette around the lit screen */
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(0, 1, 3, 0.45) 100%);
+    background: radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(0, 1, 3, 0.55) 100%);
     pointer-events: none;
     z-index: 3;
   }
@@ -396,57 +409,28 @@
   .edge-code.bl { bottom: 8px; left: 10px; }
   .edge-code.br { bottom: 8px; right: 10px; font-variant-numeric: tabular-nums; }
 
-  /* ---------- calibration strip ---------- */
-
-  .calib-strip {
-    position: relative;
-    height: 3px;
-    margin-top: 22px;
-    border-radius: 2px;
-    background: var(--rule);
-    overflow: hidden;
-  }
-
-  .calib-strip::after {
-    content: "";
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 22%;
-    background: linear-gradient(90deg, transparent, var(--accent-bright), transparent);
-    animation: calib-sweep 2.4s ease-in-out infinite;
-  }
-
-  @keyframes calib-sweep {
-    0%   { left: -22%; }
-    100% { left: 100%; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .calib-strip::after { animation: none; left: 39%; }
-  }
-
-  /* ---------- format strip ---------- */
+  /* ---------- format strip (left sidebar, vertical list) ---------- */
 
   .format-strip {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 2px;
-    margin-top: 14px;
     background: var(--rule);
     border-radius: 3px;
-    overflow: hidden;
+    overflow-y: auto;
+    max-height: calc(100vh - 170px);
   }
 
   .fmt-btn {
-    flex: 1 1 140px;
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-start;
-    padding: 14px 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
     background: var(--bg-raised);
     border: none;
-    border-bottom: 2px solid transparent;
+    border-left: 2px solid transparent;
     color: var(--ink-dim);
     font-family: inherit;
     cursor: pointer;
@@ -464,12 +448,12 @@
   .fmt-btn[aria-checked="true"] {
     background: #121b25;
     color: var(--ink);
-    border-bottom-color: var(--accent);
+    border-left-color: var(--accent);
   }
 
   .fmt-ratio {
     font-family: var(--font-mono);
-    font-size: 1.1875rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     color: var(--ink-faint);
@@ -478,20 +462,20 @@
 
   .fmt-name {
     font-family: var(--font-display);
-    font-size: 0.6875rem;
+    font-size: 0.625rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
+    text-align: right;
   }
 
   /* ---------- spec sheet ---------- */
 
   .spec-sheet {
     display: grid;
-    grid-template-columns: 190px 1fr;
-    gap: 32px;
-    margin-top: 34px;
-    padding: 26px 28px;
+    grid-template-columns: 170px 1fr;
+    gap: 24px;
+    padding: 18px 22px;
     background: rgba(13, 18, 25, 0.7);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -535,16 +519,17 @@
 
   .spec-copy h2 {
     font-family: var(--font-display);
-    font-size: 1.375rem;
+    font-size: 1.1875rem;
     font-weight: 800;
     letter-spacing: -0.01em;
-    margin: 0 0 10px;
+    margin: 0 0 6px;
     text-wrap: balance;
   }
   .spec-copy p {
     margin: 0;
+    font-size: 0.875rem;
     color: var(--ink-dim);
-    max-width: 60ch;
+    max-width: 62ch;
   }
 
   /* ---------- callout ---------- */
@@ -599,61 +584,67 @@
 
   <section id="panelExplore" class="panel" role="tabpanel" aria-labelledby="tabExploreBtn">
 
-    <div class="scene-strip" role="radiogroup" aria-label="Reference footage" data-scene-strip>
-      <!-- buttons injected by script -->
-    </div>
+    <div class="comparator">
 
-    <section class="stage-wrap" aria-label="Format comparison viewer">
-      <div class="rail" aria-hidden="true"></div>
+      <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
+        <!-- buttons injected by script -->
+      </nav>
 
-      <div class="stage" data-stage style="--ratio: 1.43;">
-        <!-- Reference footage, both via Pexels (free to use, no attribution required):
-             Ocean/cliffs by Tom Fisk (pexels.com/video/36521503),
-             Dolomites by Zlatin Georgiev (pexels.com/video/15708456).
-             Both trimmed to 8s and compressed for web. -->
-        <video data-scene muted loop playsinline preload="auto" aria-hidden="true">
-          <source src="ocean.mp4" type="video/mp4" />
-        </video>
-        <div class="crop-frame" data-crop-frame>
-          <span class="edge-code tl">IRMAX · REF</span>
-          <span class="edge-code tr" data-edge-ratio>1.43:1</span>
-          <span class="edge-code bl" data-edge-format>IMAX GT · 15/70</span>
-          <span class="edge-code br" data-edge-frame>FRAME 004821</span>
-          <div class="grain" data-grain aria-hidden="true"></div>
+      <div class="viewer">
+
+        <div class="scene-strip" role="radiogroup" aria-label="Reference footage" data-scene-strip>
+          <!-- buttons injected by script -->
         </div>
+
+        <section class="stage-wrap" aria-label="Format comparison viewer">
+          <div class="rail" aria-hidden="true"></div>
+
+          <div class="stage" data-stage style="--ratio: 1.43;">
+            <!-- Reference footage, both via Pexels (free to use, no attribution required):
+                 Ocean/cliffs by Tom Fisk (pexels.com/video/36521503),
+                 Dolomites by Zlatin Georgiev (pexels.com/video/15708456).
+                 Both trimmed to 8s and compressed for web. -->
+            <video data-scene muted loop playsinline preload="auto" aria-hidden="true">
+              <source src="ocean.mp4" type="video/mp4" />
+            </video>
+            <div class="crop-frame" data-crop-frame>
+              <span class="edge-code tl">IRMAX · REF</span>
+              <span class="edge-code tr" data-edge-ratio>1.43:1</span>
+              <span class="edge-code bl" data-edge-format>IMAX GT · 15/70</span>
+              <span class="edge-code br" data-edge-frame>FRAME 004821</span>
+              <div class="grain" data-grain aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <div class="rail" aria-hidden="true"></div>
+        </section>
+
+        <section class="spec-sheet" data-spec-sheet>
+          <div class="spec-stats">
+            <dl>
+              <div>
+                <dt>Aspect ratio</dt>
+                <dd data-stat-ratio>1.43:1</dd>
+              </div>
+              <div>
+                <dt>Picture height retained</dt>
+                <dd data-stat-height>83%</dd>
+              </div>
+              <div>
+                <dt>Gauge</dt>
+                <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
+              </div>
+            </dl>
+          </div>
+          <div class="spec-copy">
+            <h2 data-spec-name>IMAX GT (15/70)</h2>
+            <p data-spec-desc></p>
+          </div>
+        </section>
+
       </div>
 
-      <div class="rail" aria-hidden="true"></div>
-    </section>
-
-    <div class="calib-strip" aria-hidden="true"></div>
-
-    <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
-      <!-- buttons injected by script -->
-    </nav>
-
-    <section class="spec-sheet" data-spec-sheet>
-      <div class="spec-stats">
-        <dl>
-          <div>
-            <dt>Aspect ratio</dt>
-            <dd data-stat-ratio>1.43:1</dd>
-          </div>
-          <div>
-            <dt>Picture height retained</dt>
-            <dd data-stat-height>83%</dd>
-          </div>
-          <div>
-            <dt>Gauge</dt>
-            <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
-          </div>
-        </dl>
-      </div>
-      <div class="spec-copy">
-        <h2 data-spec-name>IMAX GT (15/70)</h2>
-        <p data-spec-desc></p>
-      </div>
-    </section>
+    </div>
 
     <aside class="callout">
       <p>
@@ -686,54 +677,62 @@
     </div>
     <p class="test-status" data-test-status></p>
 
-    <section class="stage-wrap" aria-label="Your video format comparison" style="margin-top: 22px;">
-      <div class="rail" aria-hidden="true"></div>
+    <div class="comparator">
 
-      <div class="stage" data-stage style="--ratio: 1.43;">
-        <div class="crop-frame" data-crop-frame>
-          <!-- Uploaded video / YouTube embeds are inserted here (inside crop-frame, not the
-               full stage) so the media — and its native play controls — are always sized to
-               the currently-visible, unmasked area, at every ratio. See data-stage-empty. -->
-          <div class="stage-empty" data-stage-empty>
-            <span>Upload a video or paste a YouTube link above to preview it here</span>
+      <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
+        <!-- buttons injected by script -->
+      </nav>
+
+      <div class="viewer">
+
+        <section class="stage-wrap" aria-label="Your video format comparison">
+          <div class="rail" aria-hidden="true"></div>
+
+          <div class="stage" data-stage style="--ratio: 1.43;">
+            <div class="crop-frame" data-crop-frame>
+              <!-- Uploaded video / YouTube embeds are inserted here (inside crop-frame, not the
+                   full stage) so the media — and its native play controls — are always sized to
+                   the currently-visible, unmasked area, at every ratio. See data-stage-empty. -->
+              <div class="stage-empty" data-stage-empty>
+                <span>Upload a video or paste a YouTube link above to preview it here</span>
+              </div>
+              <span class="edge-code tl">IRMAX · TEST</span>
+              <span class="edge-code tr" data-edge-ratio>1.43:1</span>
+              <span class="edge-code bl" data-edge-format>IMAX GT · 15/70</span>
+              <span class="edge-code br" data-edge-frame>FRAME 004821</span>
+              <div class="grain" data-grain aria-hidden="true"></div>
+            </div>
           </div>
-          <span class="edge-code tl">IRMAX · TEST</span>
-          <span class="edge-code tr" data-edge-ratio>1.43:1</span>
-          <span class="edge-code bl" data-edge-format>IMAX GT · 15/70</span>
-          <span class="edge-code br" data-edge-frame>FRAME 004821</span>
-          <div class="grain" data-grain aria-hidden="true"></div>
-        </div>
+
+          <div class="rail" aria-hidden="true"></div>
+        </section>
+
+        <section class="spec-sheet" data-spec-sheet>
+          <div class="spec-stats">
+            <dl>
+              <div>
+                <dt>Aspect ratio</dt>
+                <dd data-stat-ratio>1.43:1</dd>
+              </div>
+              <div>
+                <dt>Picture height retained</dt>
+                <dd data-stat-height>83%</dd>
+              </div>
+              <div>
+                <dt>Gauge</dt>
+                <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
+              </div>
+            </dl>
+          </div>
+          <div class="spec-copy">
+            <h2 data-spec-name>IMAX GT (15/70)</h2>
+            <p data-spec-desc></p>
+          </div>
+        </section>
+
       </div>
 
-      <div class="rail" aria-hidden="true"></div>
-    </section>
-
-    <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
-      <!-- buttons injected by script -->
-    </nav>
-
-    <section class="spec-sheet" data-spec-sheet>
-      <div class="spec-stats">
-        <dl>
-          <div>
-            <dt>Aspect ratio</dt>
-            <dd data-stat-ratio>1.43:1</dd>
-          </div>
-          <div>
-            <dt>Picture height retained</dt>
-            <dd data-stat-height>83%</dd>
-          </div>
-          <div>
-            <dt>Gauge</dt>
-            <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
-          </div>
-        </dl>
-      </div>
-      <div class="spec-copy">
-        <h2 data-spec-name>IMAX GT (15/70)</h2>
-        <p data-spec-desc></p>
-      </div>
-    </section>
+    </div>
 
   </section>
 
