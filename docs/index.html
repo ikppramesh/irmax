@@ -224,7 +224,13 @@
     color: var(--ink-faint);
     font-size: 0.9375rem;
     z-index: 1;
+    pointer-events: none;
   }
+
+  /* Same specificity as the UA [hidden] rule, but author stylesheets win ties — without this,
+     .hidden = true in JS silently did nothing and the placeholder stayed visible forever,
+     including over a video that was actually playing underneath it. */
+  .stage-empty[hidden] { display: none; }
 
   /* ---------- scene strip ---------- */
 
