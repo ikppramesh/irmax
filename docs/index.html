@@ -306,21 +306,16 @@
   }
 
   .rail {
+    /* Film-strip sprocket holes running the length of the rail — a generic, un-branded
+       cinema motif (real 35mm film perforations), not any company's logo. */
     position: relative;
-    background: linear-gradient(180deg, #0a0f16, #05070a 40%, #05070a 60%, #0a0f16);
+    background-color: #0a0f16;
+    background-image:
+      linear-gradient(180deg, #0a0f16, #05070a 40%, #05070a 60%, #0a0f16),
+      repeating-radial-gradient(circle at 50% 9px, rgba(47, 216, 255, 0.4) 0 2.5px, transparent 3px 22px);
     border: 1px solid var(--rule);
     border-radius: 3px;
     overflow: hidden;
-  }
-
-  .rail::after {
-    /* static laser-alignment mark, no longer animated */
-    content: "";
-    position: absolute;
-    left: 0; right: 0;
-    top: 30%;
-    height: 40%;
-    background: linear-gradient(180deg, transparent, rgba(47, 216, 255, 0.4), transparent);
   }
 
   .stage {
