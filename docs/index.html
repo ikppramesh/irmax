@@ -44,9 +44,9 @@
   }
 
   .page {
-    max-width: 1140px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: clamp(18px, 3vw, 32px) clamp(18px, 4vw, 32px) 56px;
+    padding: clamp(18px, 3vw, 32px) clamp(18px, 4vw, 32px) 40px;
   }
 
   /* ---------- masthead ---------- */
@@ -83,7 +83,9 @@
   .lede {
     font-size: 0.9375rem;
     color: var(--ink-dim);
-    max-width: 72ch;
+    max-width: none;
+    white-space: nowrap;
+    overflow-x: auto;
     margin: 0;
   }
 
@@ -129,13 +131,21 @@
 
   .comparator {
     display: grid;
-    grid-template-columns: 230px 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
     align-items: start;
   }
 
-  @media (max-width: 760px) {
+  @media (max-width: 800px) {
     .comparator { grid-template-columns: 1fr; }
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
   }
 
   .viewer {
@@ -143,6 +153,7 @@
     flex-direction: column;
     gap: 12px;
     min-width: 0;
+    align-items: flex-start;
   }
 
   /* ---------- test-your-own panel ---------- */
@@ -293,6 +304,7 @@
     grid-template-columns: 14px 1fr 14px;
     gap: 10px;
     align-items: stretch;
+    width: 100%;
   }
 
   .rail {
@@ -417,8 +429,8 @@
     gap: 2px;
     background: var(--rule);
     border-radius: 3px;
-    overflow-y: auto;
-    max-height: calc(100vh - 170px);
+    overflow: hidden;
+    flex-shrink: 0;
   }
 
   .fmt-btn {
@@ -472,10 +484,12 @@
   /* ---------- spec sheet ---------- */
 
   .spec-sheet {
-    display: grid;
-    grid-template-columns: 170px 1fr;
-    gap: 24px;
-    padding: 18px 22px;
+    /* Sits below the format list in the narrow left sidebar now, so stats and the
+       description stack in one column instead of sitting side by side. */
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 18px;
     background: rgba(13, 18, 25, 0.7);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -484,16 +498,20 @@
     border-radius: 6px;
     box-shadow: 0 24px 44px rgba(0, 0, 0, 0.45);
     transition: opacity 0.15s ease;
+    flex-shrink: 0;
   }
 
   .spec-sheet.swapping { opacity: 0; }
 
-  @media (max-width: 640px) {
-    .spec-sheet { grid-template-columns: 1fr; gap: 20px; padding: 22px 20px; }
+  .spec-stats dl {
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px 20px;
   }
-
-  .spec-stats dl { margin: 0; display: flex; flex-direction: column; gap: 16px; }
-  .spec-stats div + div { padding-top: 16px; border-top: 1px solid var(--rule); }
+  .spec-stats div { flex: 1 1 auto; }
+  .spec-stats div + div { padding-left: 0; border-top: none; }
   .spec-stats dt {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
@@ -532,23 +550,6 @@
     max-width: 62ch;
   }
 
-  /* ---------- callout ---------- */
-
-  .callout {
-    margin-top: 28px;
-    padding: 16px 18px;
-    border: 1px solid var(--rule);
-    border-left: 2px solid var(--accent-dim);
-    border-radius: 3px;
-    background: var(--bg-raised);
-  }
-  .callout p {
-    margin: 0;
-    font-size: 0.9375rem;
-    color: var(--ink-dim);
-  }
-  .callout strong { color: var(--ink); }
-
   /* ---------- footer ---------- */
 
   .foot {
@@ -586,9 +587,34 @@
 
     <div class="comparator">
 
-      <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
-        <!-- buttons injected by script -->
-      </nav>
+      <div class="sidebar">
+        <section class="spec-sheet" data-spec-sheet>
+          <div class="spec-stats">
+            <dl>
+              <div>
+                <dt>Aspect ratio</dt>
+                <dd data-stat-ratio>1.43:1</dd>
+              </div>
+              <div>
+                <dt>Picture height retained</dt>
+                <dd data-stat-height>83%</dd>
+              </div>
+              <div>
+                <dt>Gauge</dt>
+                <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
+              </div>
+            </dl>
+          </div>
+          <div class="spec-copy">
+            <h2 data-spec-name>IMAX GT (15/70)</h2>
+            <p data-spec-desc></p>
+          </div>
+        </section>
+
+        <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
+          <!-- buttons injected by script -->
+        </nav>
+      </div>
 
       <div class="viewer">
 
@@ -619,42 +645,9 @@
           <div class="rail" aria-hidden="true"></div>
         </section>
 
-        <section class="spec-sheet" data-spec-sheet>
-          <div class="spec-stats">
-            <dl>
-              <div>
-                <dt>Aspect ratio</dt>
-                <dd data-stat-ratio>1.43:1</dd>
-              </div>
-              <div>
-                <dt>Picture height retained</dt>
-                <dd data-stat-height>83%</dd>
-              </div>
-              <div>
-                <dt>Gauge</dt>
-                <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
-              </div>
-            </dl>
-          </div>
-          <div class="spec-copy">
-            <h2 data-spec-name>IMAX GT (15/70)</h2>
-            <p data-spec-desc></p>
-          </div>
-        </section>
-
       </div>
 
     </div>
-
-    <aside class="callout">
-      <p>
-        <strong>Not every premium format is a ratio.</strong> Disney's
-        <strong>Infinity Vision</strong> certification (2026) sets a minimum 50ft screen width,
-        requires laser projection, and 7.1-channel-plus immersive audio — but unlike IMAX, it
-        has no fixed aspect ratio requirement at all. It's a performance target, not a frame
-        shape, which is why it doesn't get a tab above.
-      </p>
-    </aside>
 
   </section>
 
@@ -679,9 +672,34 @@
 
     <div class="comparator">
 
-      <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
-        <!-- buttons injected by script -->
-      </nav>
+      <div class="sidebar">
+        <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
+          <!-- buttons injected by script -->
+        </nav>
+
+        <section class="spec-sheet" data-spec-sheet>
+          <div class="spec-stats">
+            <dl>
+              <div>
+                <dt>Aspect ratio</dt>
+                <dd data-stat-ratio>1.43:1</dd>
+              </div>
+              <div>
+                <dt>Picture height retained</dt>
+                <dd data-stat-height>83%</dd>
+              </div>
+              <div>
+                <dt>Gauge</dt>
+                <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
+              </div>
+            </dl>
+          </div>
+          <div class="spec-copy">
+            <h2 data-spec-name>IMAX GT (15/70)</h2>
+            <p data-spec-desc></p>
+          </div>
+        </section>
+      </div>
 
       <div class="viewer">
 
@@ -705,29 +723,6 @@
           </div>
 
           <div class="rail" aria-hidden="true"></div>
-        </section>
-
-        <section class="spec-sheet" data-spec-sheet>
-          <div class="spec-stats">
-            <dl>
-              <div>
-                <dt>Aspect ratio</dt>
-                <dd data-stat-ratio>1.43:1</dd>
-              </div>
-              <div>
-                <dt>Picture height retained</dt>
-                <dd data-stat-height>83%</dd>
-              </div>
-              <div>
-                <dt>Gauge</dt>
-                <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
-              </div>
-            </dl>
-          </div>
-          <div class="spec-copy">
-            <h2 data-spec-name>IMAX GT (15/70)</h2>
-            <p data-spec-desc></p>
-          </div>
         </section>
 
       </div>
