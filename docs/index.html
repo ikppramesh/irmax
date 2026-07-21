@@ -7,23 +7,24 @@
 <title>Explore Premium Formats — IRMAX</title>
 <style>
   /*
-    Deliberately single-theme (dark). A projection booth doesn't have a light
-    mode — the metaphor this page runs on (an aperture plate masking a lit
-    negative in a dark room) only reads correctly against black.
+    Deliberately single-theme (dark). A laser projector's black level only
+    means anything in a lightless room — the beam/screen-glow metaphor this
+    page runs on doesn't survive a light background.
   */
   :root {
-    --bg: #0b0a08;
-    --bg-raised: #16130f;
-    --mask: #050403;
-    --ink: #f3ede0;
-    --ink-dim: #9c9284;
-    --ink-faint: #665e50;
-    --rule: #2b261e;
-    --accent: #e8a63c;
-    --accent-dim: #7a5a22;
+    --bg: #05070a;
+    --bg-raised: #0d1219;
+    --mask: #000103;
+    --ink: #eef3f7;
+    --ink-dim: #8fa0af;
+    --ink-faint: #4d5c6b;
+    --rule: #16202b;
+    --accent: #2fd8ff;
+    --accent-dim: #145a6b;
+    --accent-bright: #b9f4ff;
 
-    --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-serif: ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --font-display: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
     --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
   }
 
@@ -32,9 +33,12 @@
 
   body {
     margin: 0;
-    background: var(--bg);
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(ellipse 900px 520px at 50% -10%, rgba(47, 216, 255, 0.09), transparent 60%),
+      repeating-linear-gradient(180deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
     color: var(--ink);
-    font-family: var(--font-serif);
+    font-family: var(--font-body);
     line-height: 1.6;
   }
 
@@ -59,18 +63,18 @@
   .eyebrow {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ink-faint);
-    margin: 18px 0 10px;
+    margin: 20px 0 10px;
   }
 
   h1 {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: clamp(1.9rem, 1.35rem + 2.2vw, 2.9rem);
-    letter-spacing: -0.01em;
-    line-height: 1.08;
+    font-size: clamp(1.9rem, 1.3rem + 2.3vw, 2.9rem);
+    letter-spacing: -0.02em;
+    line-height: 1.06;
     margin: 0 0 14px;
     text-wrap: balance;
   }
@@ -92,14 +96,31 @@
     margin-top: clamp(28px, 5vw, 40px);
   }
 
-  .sprocket {
-    background-image: repeating-radial-gradient(
-      circle at 50% 7px,
-      var(--rule) 0 3px,
-      transparent 3.5px 22px
-    );
-    background-color: var(--bg-raised);
-    border-radius: 2px;
+  .rail {
+    position: relative;
+    background: linear-gradient(180deg, #0a0f16, #05070a 40%, #05070a 60%, #0a0f16);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .rail::after {
+    /* faint laser-alignment scan traveling the rail */
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, transparent, rgba(47, 216, 255, 0.4), transparent);
+    animation: scan-rail 3.2s ease-in-out infinite;
+  }
+
+  @keyframes scan-rail {
+    0%, 100% { top: -40%; }
+    50% { top: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rail::after { animation: none; top: 30%; }
   }
 
   .stage {
@@ -115,20 +136,22 @@
     border-radius: 3px;
   }
 
-  .stage canvas {
+  .stage video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
+    object-fit: cover;
     display: block;
+    background: var(--mask);
   }
 
   .stage::after {
-    /* soft projector hot-spot */
+    /* cool screen-glow vignette */
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at 50% 60%, transparent 45%, rgba(0,0,0,0.35) 100%);
+    background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(0, 1, 3, 0.45) 100%);
     pointer-events: none;
     z-index: 3;
   }
@@ -141,8 +164,8 @@
     width: 100%;
     aspect-ratio: var(--ratio, 1.43);
     transform: translateY(-50%);
-    border: 1px solid rgba(243, 237, 224, 0.55);
-    box-shadow: 0 0 0 9999px var(--mask);
+    border: 1px solid rgba(47, 216, 255, 0.55);
+    box-shadow: 0 0 0 9999px var(--mask), 0 0 24px rgba(47, 216, 255, 0.08);
     transition: aspect-ratio 0.6s cubic-bezier(0.22, 0.7, 0.2, 1);
     z-index: 2;
   }
@@ -155,7 +178,7 @@
     position: absolute;
     inset: 0;
     mix-blend-mode: overlay;
-    opacity: 0.4;
+    opacity: 0.25;
     background-repeat: repeat;
     background-size: 96px 96px;
     animation: grain-flicker 0.6s steps(4) infinite;
@@ -178,14 +201,43 @@
     font-family: var(--font-mono);
     font-size: 0.625rem;
     letter-spacing: 0.08em;
-    color: rgba(243, 237, 224, 0.8);
+    color: rgba(238, 243, 247, 0.78);
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     white-space: nowrap;
   }
   .edge-code.tl { top: 8px; left: 10px; }
-  .edge-code.tr { top: 8px; right: 10px; color: var(--accent); font-weight: 600; }
+  .edge-code.tr { top: 8px; right: 10px; color: var(--accent-bright); font-weight: 600; }
   .edge-code.bl { bottom: 8px; left: 10px; }
   .edge-code.br { bottom: 8px; right: 10px; font-variant-numeric: tabular-nums; }
+
+  /* ---------- calibration strip ---------- */
+
+  .calib-strip {
+    position: relative;
+    height: 3px;
+    margin-top: 22px;
+    border-radius: 2px;
+    background: var(--rule);
+    overflow: hidden;
+  }
+
+  .calib-strip::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 22%;
+    background: linear-gradient(90deg, transparent, var(--accent-bright), transparent);
+    animation: calib-sweep 2.4s ease-in-out infinite;
+  }
+
+  @keyframes calib-sweep {
+    0%   { left: -22%; }
+    100% { left: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .calib-strip::after { animation: none; left: 39%; }
+  }
 
   /* ---------- format strip ---------- */
 
@@ -193,7 +245,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 2px;
-    margin-top: 18px;
+    margin-top: 14px;
     background: var(--rule);
     border-radius: 3px;
     overflow: hidden;
@@ -216,7 +268,7 @@
     transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
-  .fmt-btn:hover { background: #1c1812; color: var(--ink); }
+  .fmt-btn:hover { background: #121b25; color: var(--ink); }
 
   .fmt-btn:focus-visible {
     outline: 2px solid var(--accent);
@@ -224,7 +276,7 @@
   }
 
   .fmt-btn[aria-checked="true"] {
-    background: #1c1812;
+    background: #121b25;
     color: var(--ink);
     border-bottom-color: var(--accent);
   }
@@ -242,7 +294,7 @@
     font-family: var(--font-display);
     font-size: 0.6875rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
@@ -253,15 +305,21 @@
     grid-template-columns: 190px 1fr;
     gap: 32px;
     margin-top: 34px;
-    padding-top: 28px;
-    border-top: 1px solid var(--rule);
+    padding: 26px 28px;
+    background: rgba(13, 18, 25, 0.7);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(47, 216, 255, 0.18);
+    border-top: 2px solid var(--accent);
+    border-radius: 6px;
+    box-shadow: 0 24px 44px rgba(0, 0, 0, 0.45);
     transition: opacity 0.15s ease;
   }
 
   .spec-sheet.swapping { opacity: 0; }
 
   @media (max-width: 640px) {
-    .spec-sheet { grid-template-columns: 1fr; gap: 20px; }
+    .spec-sheet { grid-template-columns: 1fr; gap: 20px; padding: 22px 20px; }
   }
 
   .spec-stats dl { margin: 0; display: flex; flex-direction: column; gap: 16px; }
@@ -280,10 +338,10 @@
     font-size: 1.375rem;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
-    color: var(--ink);
+    color: var(--accent-bright);
   }
   .spec-stats dd.small {
-    font-family: var(--font-serif);
+    font-family: var(--font-body);
     font-size: 0.9375rem;
     font-weight: 400;
     color: var(--ink-dim);
@@ -293,6 +351,7 @@
     font-family: var(--font-display);
     font-size: 1.375rem;
     font-weight: 800;
+    letter-spacing: -0.01em;
     margin: 0 0 10px;
     text-wrap: balance;
   }
@@ -338,7 +397,7 @@
 
   <header class="masthead">
     <div class="wordmark">IRMAX</div>
-    <p class="eyebrow">Format comparison · reference reel</p>
+    <p class="eyebrow">Calibration reference · format comparison</p>
     <h1>Explore Premium Formats</h1>
     <p class="lede">
       One full-frame negative, cropped eleven different ways across a century of cinema —
@@ -348,10 +407,14 @@
   </header>
 
   <section class="stage-wrap" aria-label="Format comparison viewer">
-    <div class="sprocket" aria-hidden="true"></div>
+    <div class="rail" aria-hidden="true"></div>
 
     <div class="stage" id="stage" style="--ratio: 1.43;">
-      <canvas id="scene" width="1600" height="1119" aria-hidden="true"></canvas>
+      <!-- Aerial ocean-cliffs footage by Tom Fisk, via Pexels (pexels.com/video/36521503),
+           trimmed/compressed for web. Pexels License: free to use, no attribution required. -->
+      <video id="scene" muted loop playsinline preload="auto" aria-hidden="true">
+        <source src="ocean.mp4" type="video/mp4" />
+      </video>
       <div class="crop-frame" id="cropFrame">
         <span class="edge-code tl">IRMAX · REF</span>
         <span class="edge-code tr" id="edgeRatio">1.43:1</span>
@@ -361,8 +424,10 @@
       </div>
     </div>
 
-    <div class="sprocket" aria-hidden="true"></div>
+    <div class="rail" aria-hidden="true"></div>
   </section>
+
+  <div class="calib-strip" aria-hidden="true"></div>
 
   <nav class="format-strip" role="radiogroup" aria-label="Film format" id="formatStrip">
     <!-- buttons injected by script -->
@@ -604,52 +669,15 @@
     }, 2000);
   }
 
-  // ---- procedural reference scene (dusk ridge line, drawn once) ----
+  // ---- reference footage playback ----
+  // Real aerial ocean footage (see credit comment near the <video> tag) makes exactly how
+  // much of the picture each ratio keeps or trims immediately legible — muted/looped/inline
+  // so it behaves as ambient background, and left unplayed for reduced-motion users.
 
-  function drawScene() {
-    var canvas = document.getElementById("scene");
-    var ctx = canvas.getContext("2d");
-    var w = canvas.width, h = canvas.height;
-
-    var sky = ctx.createLinearGradient(0, 0, 0, h);
-    sky.addColorStop(0, "#0a0806");
-    sky.addColorStop(0.55, "#241407");
-    sky.addColorStop(0.72, "#7a3d12");
-    sky.addColorStop(0.84, "#c97a2e");
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, w, h);
-
-    var sunY = h * 0.74;
-    var glow = ctx.createRadialGradient(w * 0.5, sunY, 0, w * 0.5, sunY, w * 0.28);
-    glow.addColorStop(0, "rgba(255, 214, 140, 0.9)");
-    glow.addColorStop(0.35, "rgba(232, 166, 60, 0.35)");
-    glow.addColorStop(1, "rgba(232, 166, 60, 0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, w, h);
-
-    function ridge(baseY, amp, seed, color) {
-      ctx.beginPath();
-      ctx.moveTo(0, h);
-      ctx.lineTo(0, baseY);
-      var steps = 24;
-      for (var i = 0; i <= steps; i++) {
-        var x = (w / steps) * i;
-        var n = Math.sin(i * 0.7 + seed) * 0.6 + Math.sin(i * 1.9 + seed * 2.1) * 0.4;
-        var y = baseY - n * amp;
-        ctx.lineTo(x, y);
-      }
-      ctx.lineTo(w, h);
-      ctx.closePath();
-      ctx.fillStyle = color;
-      ctx.fill();
-    }
-
-    ridge(h * 0.78, h * 0.05, 1.3, "#2a180c");
-    ridge(h * 0.86, h * 0.045, 4.1, "#170e08");
-    ridge(h * 0.93, h * 0.035, 7.8, "#0b0705");
-
-    ctx.fillStyle = "rgba(0,0,0,0.25)";
-    ctx.fillRect(0, h * 0.9, w, h * 0.1);
+  function startScene() {
+    var video = document.getElementById("scene");
+    if (reduceMotion) return;
+    video.play().catch(function () { /* autoplay can be blocked; static first frame is fine */ });
   }
 
   function buildGrainTile() {
@@ -668,7 +696,7 @@
   }
 
   buildStrip();
-  drawScene();
+  startScene();
   buildGrainTile();
   select(DEFAULT_ID, strip.querySelector('.fmt-btn[data-id="' + DEFAULT_ID + '"]'));
   tickFrames();
