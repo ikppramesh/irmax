@@ -684,10 +684,13 @@
       <div class="rail" aria-hidden="true"></div>
 
       <div class="stage" data-stage style="--ratio: 1.43;">
-        <div class="stage-empty" data-stage-empty>
-          <span>Upload a video or paste a YouTube link above to preview it here</span>
-        </div>
         <div class="crop-frame" data-crop-frame>
+          <!-- Uploaded video / YouTube embeds are inserted here (inside crop-frame, not the
+               full stage) so the media — and its native play controls — are always sized to
+               the currently-visible, unmasked area, at every ratio. See data-stage-empty. -->
+          <div class="stage-empty" data-stage-empty>
+            <span>Upload a video or paste a YouTube link above to preview it here</span>
+          </div>
           <span class="edge-code tl">IRMAX · TEST</span>
           <span class="edge-code tr" data-edge-ratio>1.43:1</span>
           <span class="edge-code bl" data-edge-format>IMAX GT · 15/70</span>
@@ -849,6 +852,7 @@
    */
   function createComparator(root) {
     var stage = root.querySelector("[data-stage]");
+    var cropFrame = root.querySelector("[data-crop-frame]");
     var strip = root.querySelector("[data-format-strip]");
     var specSheet = root.querySelector("[data-spec-sheet]");
     var edgeRatio = root.querySelector("[data-edge-ratio]");
@@ -954,7 +958,7 @@
     select(DEFAULT_ID, strip.querySelector('.fmt-btn[data-id="' + DEFAULT_ID + '"]'));
     tickFrames();
 
-    return { stage: stage };
+    return { stage: stage, cropFrame: cropFrame };
   }
 
   function buildGrainTiles() {
@@ -1069,7 +1073,7 @@
   var ytLoadBtn = testRoot.querySelector("[data-yt-load]");
   var testStatusEl = testRoot.querySelector("[data-test-status]");
   var testStageEmpty = testRoot.querySelector("[data-stage-empty]");
-  var testStage = testComparator.stage;
+  var testCropFrame = testComparator.cropFrame;
 
   function setTestStatus(msg, isError) {
     testStatusEl.textContent = msg;
@@ -1077,7 +1081,7 @@
   }
 
   function clearTestMedia() {
-    var existing = testStage.querySelector("[data-user-media]");
+    var existing = testCropFrame.querySelector("[data-user-media]");
     if (existing) {
       if (existing.tagName === "VIDEO" && existing.src) {
         URL.revokeObjectURL(existing.src);
@@ -1086,6 +1090,11 @@
     }
   }
 
+  // User media is inserted INSIDE crop-frame (not the full stage, like the ambient reference
+  // clips) and given pointer-events back explicitly, since crop-frame itself is pointer-events:
+  // none. This keeps the video/iframe — and its native controls — sized to exactly the visible,
+  // unmasked area at every ratio, instead of the full stage (where a control bar could render
+  // underneath the opaque letterbox mask and become invisible for any ratio narrower than 1.19:1).
   function loadLocalFile(file) {
     if (!file) return;
     clearTestMedia();
@@ -1094,8 +1103,9 @@
     video.dataset.userMedia = "";
     video.controls = true;
     video.playsInline = true;
+    video.style.pointerEvents = "auto";
     video.src = URL.createObjectURL(file);
-    testStage.appendChild(video);
+    testCropFrame.insertBefore(video, testCropFrame.firstChild);
     setTestStatus("Loaded from this device: " + file.name);
   }
 
@@ -1128,7 +1138,8 @@
     iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
     iframe.setAttribute("allowfullscreen", "");
     iframe.setAttribute("frameborder", "0");
-    testStage.appendChild(iframe);
+    iframe.style.pointerEvents = "auto";
+    testCropFrame.insertBefore(iframe, testCropFrame.firstChild);
     setTestStatus("Loaded YouTube video " + id);
   }
 
