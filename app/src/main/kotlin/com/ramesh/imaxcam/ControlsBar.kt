@@ -60,23 +60,3 @@ fun ModeToggle(mode: CaptureMode, onChange: (CaptureMode) -> Unit) {
         }
     }
 }
-
-@Composable
-fun RatioToggle(ratio: ImaxRatio, onChange: (ImaxRatio) -> Unit) {
-    Row(
-        modifier = Modifier
-            .background(Color.White.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
-            .padding(2.dp)
-    ) {
-        ImaxRatio.entries.forEach { r ->
-            Text(
-                text = r.label,
-                color = if (r == ratio) Color.Black else Color.White,
-                modifier = Modifier
-                    .background(if (r == ratio) Color.White else Color.Transparent, RoundedCornerShape(6.dp))
-                    .clickable { onChange(r) }
-                    .padding(horizontal = 10.dp, vertical = 6.dp)
-            )
-        }
-    }
-}

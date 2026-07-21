@@ -56,7 +56,7 @@ fun CaptureScreen(onShowCapabilities: () -> Unit) {
     var selectedFacing by remember { mutableStateOf(CameraSelector.LENS_FACING_BACK) }
     var selectedCameraId by remember { mutableStateOf<String?>(null) }
     var mode by remember { mutableStateOf(CaptureMode.PHOTO) }
-    var selectedRatio by remember { mutableStateOf(ImaxRatio.R143) }
+    var selectedRatio by remember { mutableStateOf(ImaxRatio.IMAX_GT) }
     var selectedFilter by remember { mutableStateOf(CameraFilter.NONE) }
     var selectedResolution by remember { mutableStateOf<CaptureSize?>(null) }
     var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }
@@ -214,7 +214,11 @@ fun CaptureScreen(onShowCapabilities: () -> Unit) {
                         Text("ⓘ", color = Color.White)
                     }
                 }
-                RatioToggle(ratio = selectedRatio, onChange = { if (!isRecording) selectedRatio = it })
+                LabeledDropdown(
+                    label = "Ratio: ${selectedRatio.label}",
+                    options = ImaxRatio.entries.map { "${it.short} (${it.label})" to it },
+                    onSelect = { r -> if (!isRecording) selectedRatio = r }
+                )
                 ModeToggle(mode = mode, onChange = { if (!isRecording) mode = it })
                 LabeledDropdown(
                     label = "Lens: ${lensLabel(reports, selectedReport, selectedFacing)}",

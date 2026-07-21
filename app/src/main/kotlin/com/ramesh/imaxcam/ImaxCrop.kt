@@ -5,10 +5,24 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
 
-/** The two IMAX film ratios the app can frame/crop for. */
-enum class ImaxRatio(val value: Float, val label: String, val fileTag: String) {
-    R143(1.43f, "1:43:1", "143"),
-    R190(1.90f, "1:90:1", "190"),
+/**
+ * Theatrical film ratios the app can frame/crop for, tallest to widest — the same lineup as
+ * docs/index.html's format comparison page, so the app and the web page never disagree on a
+ * ratio's name or number. [label] uses standard decimal notation (e.g. "1.43:1"), not colons
+ * throughout, matching real cinema usage.
+ */
+enum class ImaxRatio(val value: Float, val label: String, val short: String, val fileTag: String) {
+    MOVIETONE(1.19f, "1.19:1", "Movietone", "119"),
+    ACADEMY(1.37f, "1.37:1", "Academy", "137"),
+    IMAX_GT(1.43f, "1.43:1", "IMAX GT", "143"),
+    EUROPEAN_FLAT(1.66f, "1.66:1", "Euro Flat", "166"),
+    FLAT_35MM(1.85f, "1.85:1", "35mm Flat", "185"),
+    IMAX_DIGITAL(1.90f, "1.90:1", "IMAX Digital", "190"),
+    SEVENTY_MM(2.20f, "2.20:1", "70mm", "220"),
+    SCOPE_35MM(2.39f, "2.39:1", "35mm Scope", "239"),
+    CINEMASCOPE(2.55f, "2.55:1", "CinemaScope", "255"),
+    CINERAMA(2.59f, "2.59:1", "Cinerama", "259"),
+    ULTRA_PANAVISION(2.76f, "2.76:1", "Ultra Panavision", "276"),
 }
 
 // Shared by the live viewfinder overlay and the photo/video crop pipelines so the watermark you
