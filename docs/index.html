@@ -22,6 +22,7 @@
     --accent: #2fd8ff;
     --accent-dim: #145a6b;
     --accent-bright: #b9f4ff;
+    --error: #ff8a8a;
 
     --font-display: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
     --font-body: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
@@ -50,7 +51,7 @@
 
   /* ---------- masthead ---------- */
 
-  .masthead { margin-bottom: clamp(28px, 5vw, 44px); }
+  .masthead { margin-bottom: clamp(20px, 4vw, 32px); }
 
   .wordmark {
     font-family: var(--font-display);
@@ -86,12 +87,151 @@
     margin: 0;
   }
 
+  /* ---------- tabs ---------- */
+
+  .tabs {
+    display: flex;
+    margin-top: clamp(24px, 5vw, 36px);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .tab-btn {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    letter-spacing: -0.005em;
+    color: var(--ink-faint);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 4px 12px;
+    margin-bottom: -1px;
+    cursor: pointer;
+  }
+
+  .tab-btn + .tab-btn { margin-left: 22px; }
+
+  .tab-btn:hover { color: var(--ink-dim); }
+
+  .tab-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .tab-btn[aria-selected="true"] {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .panel { margin-top: clamp(24px, 5vw, 36px); }
+
+  /* ---------- test-your-own panel ---------- */
+
+  .test-note {
+    font-size: 0.9375rem;
+    color: var(--ink-dim);
+    max-width: 62ch;
+    margin: 0 0 18px;
+  }
+
+  .upload-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .file-btn {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    background: var(--bg-raised);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .file-btn:hover { border-color: var(--accent-dim); }
+  .file-btn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .upload-divider {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .yt-input {
+    flex: 1 1 220px;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--ink);
+    background: var(--bg-raised);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 10px 12px;
+  }
+
+  .yt-input::placeholder { color: var(--ink-faint); }
+
+  .yt-input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .yt-load-btn {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #041014;
+    background: var(--accent);
+    border: none;
+    border-radius: 3px;
+    padding: 10px 16px;
+    cursor: pointer;
+  }
+
+  .yt-load-btn:hover { background: var(--accent-bright); }
+
+  .yt-load-btn:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
+  }
+
+  .test-status {
+    margin: 10px 0 0;
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+    min-height: 1.2em;
+  }
+
+  .test-status.is-error { color: var(--error); }
+
+  .stage-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 0.9375rem;
+    z-index: 1;
+  }
+
   /* ---------- scene strip ---------- */
 
   .scene-strip {
     display: flex;
     gap: 8px;
-    margin-top: 18px;
+    margin-bottom: 18px;
   }
 
   .scene-btn {
@@ -127,7 +267,6 @@
     grid-template-columns: 14px 1fr 14px;
     gap: 10px;
     align-items: stretch;
-    margin-top: clamp(28px, 5vw, 40px);
   }
 
   .rail {
@@ -170,7 +309,7 @@
     border-radius: 3px;
   }
 
-  .stage video {
+  .stage video, .stage iframe {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -178,6 +317,7 @@
     object-fit: cover;
     display: block;
     background: var(--mask);
+    border: 0;
   }
 
   .stage::after {
@@ -216,6 +356,7 @@
     background-repeat: repeat;
     background-size: 96px 96px;
     animation: grain-flicker 0.6s steps(4) infinite;
+    pointer-events: none;
   }
 
   @keyframes grain-flicker {
@@ -238,6 +379,7 @@
     color: rgba(238, 243, 247, 0.78);
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     white-space: nowrap;
+    pointer-events: none;
   }
   .edge-code.tl { top: 8px; left: 10px; }
   .edge-code.tr { top: 8px; right: 10px; color: var(--accent-bright); font-weight: 600; }
@@ -440,71 +582,147 @@
     </p>
   </header>
 
-  <div class="scene-strip" role="radiogroup" aria-label="Reference footage" id="sceneStrip">
-    <!-- buttons injected by script -->
-  </div>
-
-  <section class="stage-wrap" aria-label="Format comparison viewer">
-    <div class="rail" aria-hidden="true"></div>
-
-    <div class="stage" id="stage" style="--ratio: 1.43;">
-      <!-- Reference footage, both via Pexels (free to use, no attribution required):
-           Ocean/cliffs by Tom Fisk (pexels.com/video/36521503),
-           Dolomites by Zlatin Georgiev (pexels.com/video/15708456).
-           Both trimmed to 8s and compressed for web. -->
-      <video id="scene" muted loop playsinline preload="auto" aria-hidden="true">
-        <source src="ocean.mp4" type="video/mp4" />
-      </video>
-      <div class="crop-frame" id="cropFrame">
-        <span class="edge-code tl">IRMAX · REF</span>
-        <span class="edge-code tr" id="edgeRatio">1.43:1</span>
-        <span class="edge-code bl" id="edgeFormat">IMAX GT · 15/70</span>
-        <span class="edge-code br" id="edgeFrame">FRAME 004821</span>
-        <div class="grain" id="grain" aria-hidden="true"></div>
-      </div>
-    </div>
-
-    <div class="rail" aria-hidden="true"></div>
-  </section>
-
-  <div class="calib-strip" aria-hidden="true"></div>
-
-  <nav class="format-strip" role="radiogroup" aria-label="Film format" id="formatStrip">
-    <!-- buttons injected by script -->
+  <nav class="tabs" role="tablist" aria-label="Page section">
+    <button type="button" class="tab-btn" role="tab" id="tabExploreBtn" aria-controls="panelExplore">Explore Formats</button>
+    <button type="button" class="tab-btn" role="tab" id="tabTestBtn" aria-controls="panelTest">Test Your Own</button>
   </nav>
 
-  <section class="spec-sheet" id="specSheet">
-    <div class="spec-stats">
-      <dl>
-        <div>
-          <dt>Aspect ratio</dt>
-          <dd id="statRatio">1.43:1</dd>
-        </div>
-        <div>
-          <dt>Picture height retained</dt>
-          <dd id="statHeight">83%</dd>
-        </div>
-        <div>
-          <dt>Gauge</dt>
-          <dd class="small" id="statGauge">65mm negative · 15-perf</dd>
-        </div>
-      </dl>
+  <section id="panelExplore" class="panel" role="tabpanel" aria-labelledby="tabExploreBtn">
+
+    <div class="scene-strip" role="radiogroup" aria-label="Reference footage" data-scene-strip>
+      <!-- buttons injected by script -->
     </div>
-    <div class="spec-copy">
-      <h2 id="specName">IMAX GT (15/70)</h2>
-      <p id="specDesc"></p>
-    </div>
+
+    <section class="stage-wrap" aria-label="Format comparison viewer">
+      <div class="rail" aria-hidden="true"></div>
+
+      <div class="stage" data-stage style="--ratio: 1.43;">
+        <!-- Reference footage, both via Pexels (free to use, no attribution required):
+             Ocean/cliffs by Tom Fisk (pexels.com/video/36521503),
+             Dolomites by Zlatin Georgiev (pexels.com/video/15708456).
+             Both trimmed to 8s and compressed for web. -->
+        <video data-scene muted loop playsinline preload="auto" aria-hidden="true">
+          <source src="ocean.mp4" type="video/mp4" />
+        </video>
+        <div class="crop-frame" data-crop-frame>
+          <span class="edge-code tl">IRMAX · REF</span>
+          <span class="edge-code tr" data-edge-ratio>1.43:1</span>
+          <span class="edge-code bl" data-edge-format>IMAX GT · 15/70</span>
+          <span class="edge-code br" data-edge-frame>FRAME 004821</span>
+          <div class="grain" data-grain aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="rail" aria-hidden="true"></div>
+    </section>
+
+    <div class="calib-strip" aria-hidden="true"></div>
+
+    <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
+      <!-- buttons injected by script -->
+    </nav>
+
+    <section class="spec-sheet" data-spec-sheet>
+      <div class="spec-stats">
+        <dl>
+          <div>
+            <dt>Aspect ratio</dt>
+            <dd data-stat-ratio>1.43:1</dd>
+          </div>
+          <div>
+            <dt>Picture height retained</dt>
+            <dd data-stat-height>83%</dd>
+          </div>
+          <div>
+            <dt>Gauge</dt>
+            <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="spec-copy">
+        <h2 data-spec-name>IMAX GT (15/70)</h2>
+        <p data-spec-desc></p>
+      </div>
+    </section>
+
+    <aside class="callout">
+      <p>
+        <strong>Not every premium format is a ratio.</strong> Disney's
+        <strong>Infinity Vision</strong> certification (2026) sets a minimum 50ft screen width,
+        requires laser projection, and 7.1-channel-plus immersive audio — but unlike IMAX, it
+        has no fixed aspect ratio requirement at all. It's a performance target, not a frame
+        shape, which is why it doesn't get a tab above.
+      </p>
+    </aside>
+
   </section>
 
-  <aside class="callout">
-    <p>
-      <strong>Not every premium format is a ratio.</strong> Disney's
-      <strong>Infinity Vision</strong> certification (2026) sets a minimum 50ft screen width,
-      requires laser projection, and 7.1-channel-plus immersive audio — but unlike IMAX, it
-      has no fixed aspect ratio requirement at all. It's a performance target, not a frame
-      shape, which is why it doesn't get a tab above.
+  <section id="panelTest" class="panel" role="tabpanel" aria-labelledby="tabTestBtn" hidden>
+
+    <p class="test-note">
+      Upload a video from this device, or paste a YouTube link, to preview it against the
+      same 11 formats. Local files are read directly by your browser and never uploaded
+      anywhere — nothing leaves this device.
     </p>
-  </aside>
+
+    <div class="upload-row">
+      <label class="file-btn">
+        Choose video file…
+        <input type="file" accept="video/*" data-file-input hidden />
+      </label>
+      <span class="upload-divider">or</span>
+      <input type="url" class="yt-input" placeholder="Paste a YouTube link" data-yt-input />
+      <button type="button" class="yt-load-btn" data-yt-load>Load</button>
+    </div>
+    <p class="test-status" data-test-status></p>
+
+    <section class="stage-wrap" aria-label="Your video format comparison" style="margin-top: 22px;">
+      <div class="rail" aria-hidden="true"></div>
+
+      <div class="stage" data-stage style="--ratio: 1.43;">
+        <div class="stage-empty" data-stage-empty>
+          <span>Upload a video or paste a YouTube link above to preview it here</span>
+        </div>
+        <div class="crop-frame" data-crop-frame>
+          <span class="edge-code tl">IRMAX · TEST</span>
+          <span class="edge-code tr" data-edge-ratio>1.43:1</span>
+          <span class="edge-code bl" data-edge-format>IMAX GT · 15/70</span>
+          <span class="edge-code br" data-edge-frame>FRAME 004821</span>
+          <div class="grain" data-grain aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="rail" aria-hidden="true"></div>
+    </section>
+
+    <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
+      <!-- buttons injected by script -->
+    </nav>
+
+    <section class="spec-sheet" data-spec-sheet>
+      <div class="spec-stats">
+        <dl>
+          <div>
+            <dt>Aspect ratio</dt>
+            <dd data-stat-ratio>1.43:1</dd>
+          </div>
+          <div>
+            <dt>Picture height retained</dt>
+            <dd data-stat-height>83%</dd>
+          </div>
+          <div>
+            <dt>Gauge</dt>
+            <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="spec-copy">
+        <h2 data-spec-name>IMAX GT (15/70)</h2>
+        <p data-spec-desc></p>
+      </div>
+    </section>
+
+  </section>
 
   <footer class="foot">
     <p>
@@ -618,110 +836,153 @@
 
   var DEFAULT_ID = "imax-gt"; // what the IRMAX app itself shoots — kept as the default tab even though it's no longer the tallest entry
   var FULL_RATIO = Math.min.apply(null, FORMATS.map(function (f) { return f.ratio; }));
-
-  var stage = document.getElementById("stage");
-  var strip = document.getElementById("formatStrip");
-  var sceneStrip = document.getElementById("sceneStrip");
-  var specSheet = document.getElementById("specSheet");
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var frameBase = 4821;
-  var frameCounters = {};
 
-  FORMATS.forEach(function (f, i) { frameCounters[f.id] = frameBase + i * 137; });
+  /**
+   * Wires up one independent stage + format-strip + spec-sheet instance, scoped entirely to
+   * `root` via data-attributes (not IDs — this factory is called twice, once for the built-in
+   * reference footage and once for the "Test Your Own" panel, so IDs would collide).
+   */
+  function createComparator(root) {
+    var stage = root.querySelector("[data-stage]");
+    var strip = root.querySelector("[data-format-strip]");
+    var specSheet = root.querySelector("[data-spec-sheet]");
+    var edgeRatio = root.querySelector("[data-edge-ratio]");
+    var edgeFormat = root.querySelector("[data-edge-format]");
+    var edgeFrame = root.querySelector("[data-edge-frame]");
+    var statRatio = root.querySelector("[data-stat-ratio]");
+    var statHeight = root.querySelector("[data-stat-height]");
+    var statGauge = root.querySelector("[data-stat-gauge]");
+    var specName = root.querySelector("[data-spec-name]");
+    var specDesc = root.querySelector("[data-spec-desc]");
 
-  function buildStrip() {
-    FORMATS.forEach(function (f) {
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "fmt-btn";
-      var isDefault = f.id === DEFAULT_ID;
-      btn.setAttribute("role", "radio");
-      btn.setAttribute("aria-checked", isDefault ? "true" : "false");
-      btn.setAttribute("tabindex", isDefault ? "0" : "-1");
-      btn.dataset.id = f.id;
+    var frameBase = 4821;
+    var frameCounters = {};
+    FORMATS.forEach(function (f, i) { frameCounters[f.id] = frameBase + i * 137; });
 
-      var ratioEl = document.createElement("span");
-      ratioEl.className = "fmt-ratio";
-      ratioEl.textContent = f.ratio.toFixed(2) + ":1";
+    function buildStrip() {
+      FORMATS.forEach(function (f) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "fmt-btn";
+        var isDefault = f.id === DEFAULT_ID;
+        btn.setAttribute("role", "radio");
+        btn.setAttribute("aria-checked", isDefault ? "true" : "false");
+        btn.setAttribute("tabindex", isDefault ? "0" : "-1");
+        btn.dataset.id = f.id;
 
-      var nameEl = document.createElement("span");
-      nameEl.className = "fmt-name";
-      nameEl.textContent = f.short;
+        var ratioEl = document.createElement("span");
+        ratioEl.className = "fmt-ratio";
+        ratioEl.textContent = f.ratio.toFixed(2) + ":1";
 
-      btn.appendChild(ratioEl);
-      btn.appendChild(nameEl);
-      btn.addEventListener("click", function () { select(f.id, btn); });
-      btn.addEventListener("keydown", onStripKeydown);
+        var nameEl = document.createElement("span");
+        nameEl.className = "fmt-name";
+        nameEl.textContent = f.short;
 
-      strip.appendChild(btn);
-    });
-  }
+        btn.appendChild(ratioEl);
+        btn.appendChild(nameEl);
+        btn.addEventListener("click", function () { select(f.id, btn); });
+        btn.addEventListener("keydown", onStripKeydown);
 
-  function onStripKeydown(e) {
-    var buttons = Array.prototype.slice.call(strip.querySelectorAll(".fmt-btn"));
-    var idx = buttons.indexOf(e.currentTarget);
-    var next = null;
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = buttons[(idx + 1) % buttons.length];
-    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = buttons[(idx - 1 + buttons.length) % buttons.length];
-    if (next) {
-      e.preventDefault();
-      next.focus();
-      select(next.dataset.id, next);
+        strip.appendChild(btn);
+      });
     }
-  }
 
-  function select(id, btnEl) {
-    var f = FORMATS.filter(function (x) { return x.id === id; })[0];
-    if (!f) return;
-
-    Array.prototype.forEach.call(strip.querySelectorAll(".fmt-btn"), function (b) {
-      var checked = b === btnEl;
-      b.setAttribute("aria-checked", checked ? "true" : "false");
-      b.setAttribute("tabindex", checked ? "0" : "-1");
-    });
-
-    stage.style.setProperty("--ratio", f.ratio);
-    document.getElementById("edgeRatio").textContent = f.ratio.toFixed(2) + ":1";
-    document.getElementById("edgeFormat").textContent = f.short + " · " + f.gauge.split(" · ")[0];
-    document.getElementById("edgeFrame").textContent = "FRAME " + String(frameCounters[id]).padStart(6, "0");
-
-    var swap = function () {
-      document.getElementById("statRatio").textContent = f.ratio.toFixed(2) + ":1";
-      document.getElementById("statHeight").textContent = Math.round((FULL_RATIO / f.ratio) * 100) + "%";
-      document.getElementById("statGauge").textContent = f.gauge;
-      document.getElementById("specName").textContent = f.name;
-      document.getElementById("specDesc").textContent = f.desc;
-    };
-
-    if (reduceMotion) {
-      swap();
-    } else {
-      specSheet.classList.add("swapping");
-      window.setTimeout(function () {
-        swap();
-        specSheet.classList.remove("swapping");
-      }, 150);
-    }
-  }
-
-  function tickFrames() {
-    if (reduceMotion) return;
-    window.setInterval(function () {
-      FORMATS.forEach(function (f) { frameCounters[f.id]++; });
-      var checked = strip.querySelector('.fmt-btn[aria-checked="true"]');
-      if (checked) {
-        document.getElementById("edgeFrame").textContent =
-          "FRAME " + String(frameCounters[checked.dataset.id]).padStart(6, "0");
+    function onStripKeydown(e) {
+      var buttons = Array.prototype.slice.call(strip.querySelectorAll(".fmt-btn"));
+      var idx = buttons.indexOf(e.currentTarget);
+      var next = null;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") next = buttons[(idx + 1) % buttons.length];
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = buttons[(idx - 1 + buttons.length) % buttons.length];
+      if (next) {
+        e.preventDefault();
+        next.focus();
+        select(next.dataset.id, next);
       }
-    }, 2000);
+    }
+
+    function select(id, btnEl) {
+      var f = FORMATS.filter(function (x) { return x.id === id; })[0];
+      if (!f) return;
+
+      Array.prototype.forEach.call(strip.querySelectorAll(".fmt-btn"), function (b) {
+        var checked = b === btnEl;
+        b.setAttribute("aria-checked", checked ? "true" : "false");
+        b.setAttribute("tabindex", checked ? "0" : "-1");
+      });
+
+      stage.style.setProperty("--ratio", f.ratio);
+      edgeRatio.textContent = f.ratio.toFixed(2) + ":1";
+      edgeFormat.textContent = f.short + " · " + f.gauge.split(" · ")[0];
+      edgeFrame.textContent = "FRAME " + String(frameCounters[id]).padStart(6, "0");
+
+      var swap = function () {
+        statRatio.textContent = f.ratio.toFixed(2) + ":1";
+        statHeight.textContent = Math.round((FULL_RATIO / f.ratio) * 100) + "%";
+        statGauge.textContent = f.gauge;
+        specName.textContent = f.name;
+        specDesc.textContent = f.desc;
+      };
+
+      if (reduceMotion) {
+        swap();
+      } else {
+        specSheet.classList.add("swapping");
+        window.setTimeout(function () {
+          swap();
+          specSheet.classList.remove("swapping");
+        }, 150);
+      }
+    }
+
+    function tickFrames() {
+      if (reduceMotion) return;
+      window.setInterval(function () {
+        FORMATS.forEach(function (f) { frameCounters[f.id]++; });
+        var checked = strip.querySelector('.fmt-btn[aria-checked="true"]');
+        if (checked) {
+          edgeFrame.textContent = "FRAME " + String(frameCounters[checked.dataset.id]).padStart(6, "0");
+        }
+      }, 2000);
+    }
+
+    buildStrip();
+    select(DEFAULT_ID, strip.querySelector('.fmt-btn[data-id="' + DEFAULT_ID + '"]'));
+    tickFrames();
+
+    return { stage: stage };
   }
 
-  // ---- reference footage playback ----
+  function buildGrainTiles() {
+    var size = 96;
+    var c = document.createElement("canvas");
+    c.width = size; c.height = size;
+    var ctx = c.getContext("2d");
+    var img = ctx.createImageData(size, size);
+    for (var i = 0; i < img.data.length; i += 4) {
+      var v = Math.random() * 255;
+      img.data[i] = v; img.data[i + 1] = v; img.data[i + 2] = v;
+      img.data[i + 3] = Math.random() * 40;
+    }
+    ctx.putImageData(img, 0, 0);
+    var url = "url(" + c.toDataURL() + ")";
+    Array.prototype.forEach.call(document.querySelectorAll("[data-grain]"), function (g) {
+      g.style.backgroundImage = url;
+    });
+  }
+
+  var exploreRoot = document.getElementById("panelExplore");
+  var testRoot = document.getElementById("panelTest");
+  var exploreComparator = createComparator(exploreRoot);
+  var testComparator = createComparator(testRoot);
+
+  // ---- reference footage (Explore tab) ----
   // Real footage (see credit comment near the <video> tag) makes exactly how much of the
-  // picture each ratio keeps or trims immediately legible — muted/looped/inline so it behaves
-  // as ambient background, and left unplayed for reduced-motion users. Two clips are offered
-  // since a horizon-heavy scene (mountains) and a texture-heavy one (cliffs/water) show the
-  // crop tradeoff differently.
+  // picture each ratio keeps or trims immediately legible. Two clips are offered since a
+  // horizon-heavy scene (mountains) and a texture-heavy one (cliffs/water) show the crop
+  // tradeoff differently.
+
+  var sceneStrip = exploreRoot.querySelector("[data-scene-strip]");
 
   function buildSceneStrip() {
     SCENES.forEach(function (s) {
@@ -745,41 +1006,146 @@
       b.setAttribute("aria-checked", b === btnEl ? "true" : "false");
     });
 
-    var video = document.getElementById("scene");
+    var video = exploreRoot.querySelector("video[data-scene]");
     video.querySelector("source").src = s.src;
     video.load();
-    if (!reduceMotion) {
+    if (!reduceMotion && !exploreRoot.hidden) {
       video.play().catch(function () { /* autoplay can be blocked; static first frame is fine */ });
     }
   }
 
-  function startScene() {
-    var video = document.getElementById("scene");
-    if (reduceMotion) return;
-    video.play().catch(function () { /* autoplay can be blocked; static first frame is fine */ });
+  // ---- tabs ----
+
+  var tabButtons = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panelsByBtn = {};
+  tabButtons.forEach(function (btn) {
+    panelsByBtn[btn.id] = document.getElementById(btn.getAttribute("aria-controls"));
+  });
+
+  function activateTab(activeBtn) {
+    tabButtons.forEach(function (btn) {
+      var active = btn === activeBtn;
+      btn.setAttribute("aria-selected", active ? "true" : "false");
+      btn.setAttribute("tabindex", active ? "0" : "-1");
+      var panel = panelsByBtn[btn.id];
+      panel.hidden = !active;
+
+      // Only the built-in ambient reference clip auto-plays/pauses with tab visibility —
+      // a user's own uploaded video should never start/stop itself unexpectedly.
+      var ambient = panel.querySelector("video[data-scene]");
+      if (ambient) {
+        if (active && !reduceMotion) ambient.play().catch(function () {});
+        else ambient.pause();
+      }
+    });
   }
 
-  function buildGrainTile() {
-    var size = 96;
-    var c = document.createElement("canvas");
-    c.width = size; c.height = size;
-    var ctx = c.getContext("2d");
-    var img = ctx.createImageData(size, size);
-    for (var i = 0; i < img.data.length; i += 4) {
-      var v = Math.random() * 255;
-      img.data[i] = v; img.data[i + 1] = v; img.data[i + 2] = v;
-      img.data[i + 3] = Math.random() * 40;
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () { activateTab(btn); });
+    btn.addEventListener("keydown", function (e) {
+      var idx = tabButtons.indexOf(btn);
+      var next = null;
+      if (e.key === "ArrowRight") next = tabButtons[(idx + 1) % tabButtons.length];
+      else if (e.key === "ArrowLeft") next = tabButtons[(idx - 1 + tabButtons.length) % tabButtons.length];
+      if (next) {
+        e.preventDefault();
+        next.focus();
+        activateTab(next);
+      }
+    });
+  });
+
+  // ---- test-your-own: local file upload + YouTube embed ----
+  // Local files use URL.createObjectURL, which reads the file directly from disk into an
+  // in-memory blob URL — the file is never sent over the network. This page has no backend
+  // to upload to anyway (it's static), so that's guaranteed, not just promised.
+
+  var fileInput = testRoot.querySelector("[data-file-input]");
+  var ytInput = testRoot.querySelector("[data-yt-input]");
+  var ytLoadBtn = testRoot.querySelector("[data-yt-load]");
+  var testStatusEl = testRoot.querySelector("[data-test-status]");
+  var testStageEmpty = testRoot.querySelector("[data-stage-empty]");
+  var testStage = testComparator.stage;
+
+  function setTestStatus(msg, isError) {
+    testStatusEl.textContent = msg;
+    testStatusEl.classList.toggle("is-error", !!isError);
+  }
+
+  function clearTestMedia() {
+    var existing = testStage.querySelector("[data-user-media]");
+    if (existing) {
+      if (existing.tagName === "VIDEO" && existing.src) {
+        URL.revokeObjectURL(existing.src);
+      }
+      existing.remove();
     }
-    ctx.putImageData(img, 0, 0);
-    document.getElementById("grain").style.backgroundImage = "url(" + c.toDataURL() + ")";
   }
 
-  buildStrip();
+  function loadLocalFile(file) {
+    if (!file) return;
+    clearTestMedia();
+    testStageEmpty.hidden = true;
+    var video = document.createElement("video");
+    video.dataset.userMedia = "";
+    video.controls = true;
+    video.playsInline = true;
+    video.src = URL.createObjectURL(file);
+    testStage.appendChild(video);
+    setTestStatus("Loaded from this device: " + file.name);
+  }
+
+  function extractYouTubeId(raw) {
+    var url;
+    try { url = new URL(raw.trim()); } catch (e) { return null; }
+    var host = url.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") {
+      return url.pathname.slice(1).split("/")[0] || null;
+    }
+    if (host === "youtube.com" || host === "m.youtube.com") {
+      if (url.searchParams.get("v")) return url.searchParams.get("v");
+      var m = url.pathname.match(/\/(embed|shorts|live)\/([^/?]+)/);
+      if (m) return m[2];
+    }
+    return null;
+  }
+
+  function loadYouTube(raw) {
+    var id = extractYouTubeId(raw);
+    if (!id) {
+      setTestStatus("Couldn't read a video ID from that link — paste a normal youtube.com or youtu.be URL.", true);
+      return;
+    }
+    clearTestMedia();
+    testStageEmpty.hidden = true;
+    var iframe = document.createElement("iframe");
+    iframe.dataset.userMedia = "";
+    iframe.src = "https://www.youtube-nocookie.com/embed/" + id + "?rel=0";
+    iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
+    iframe.setAttribute("allowfullscreen", "");
+    iframe.setAttribute("frameborder", "0");
+    testStage.appendChild(iframe);
+    setTestStatus("Loaded YouTube video " + id);
+  }
+
+  fileInput.addEventListener("change", function () {
+    if (fileInput.files && fileInput.files[0]) loadLocalFile(fileInput.files[0]);
+  });
+
+  ytLoadBtn.addEventListener("click", function () {
+    if (ytInput.value.trim()) loadYouTube(ytInput.value);
+  });
+
+  ytInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      ytLoadBtn.click();
+    }
+  });
+
   buildSceneStrip();
-  startScene();
-  buildGrainTile();
-  select(DEFAULT_ID, strip.querySelector('.fmt-btn[data-id="' + DEFAULT_ID + '"]'));
-  tickFrames();
+  buildGrainTiles();
+  activateTab(tabButtons[0]);
 })();
 </script>
 
