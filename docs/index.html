@@ -331,6 +331,9 @@
   }
 
   .crop-frame {
+    /* Purely a visual overlay (border + mask + labels) — must never intercept clicks, since
+       it sits above whatever is playing in the stage (in the Test tab that's a video with
+       native controls, which would otherwise be unclickable underneath it). */
     position: absolute;
     left: 0;
     right: 0;
@@ -341,6 +344,7 @@
     border: 1px solid rgba(47, 216, 255, 0.55);
     box-shadow: 0 0 0 9999px var(--mask), 0 0 24px rgba(47, 216, 255, 0.08);
     transition: aspect-ratio 0.6s cubic-bezier(0.22, 0.7, 0.2, 1);
+    pointer-events: none;
     z-index: 2;
   }
 
