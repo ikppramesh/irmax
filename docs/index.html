@@ -419,6 +419,92 @@
   .edge-code.bl { bottom: 8px; left: 10px; }
   .edge-code.br { bottom: 8px; right: 10px; font-variant-numeric: tabular-nums; }
 
+  /* ---------- sidebar head + info button ---------- */
+
+  .sidebar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .sidebar-title {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .info-btn {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--ink-dim);
+    background: var(--bg-raised);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .info-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+
+  .info-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- info modal ---------- */
+
+  .info-modal {
+    position: fixed;
+    margin: auto;
+    max-width: min(520px, calc(100vw - 48px));
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .info-modal::backdrop {
+    background: rgba(0, 1, 3, 0.7);
+  }
+
+  .info-modal .spec-sheet {
+    margin: 0;
+  }
+
+  .info-modal-close {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8125rem;
+    color: var(--ink);
+    background: var(--bg-raised);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .info-modal-close:hover { color: var(--accent); border-color: var(--accent-dim); }
+
+  .info-modal-close:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
   /* ---------- format strip (left sidebar, vertical list) ---------- */
 
   .format-strip {
@@ -460,6 +546,30 @@
     color: var(--ink);
     border-left-color: var(--accent);
   }
+
+  .fmt-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Original frame-outline icon, sized to each format's real aspect ratio - not a brand logo. */
+  .fmt-icon {
+    width: 28px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .fmt-icon-rect {
+    display: block;
+    border: 1.5px solid var(--ink-faint);
+    border-radius: 1px;
+  }
+
+  .fmt-btn[aria-checked="true"] .fmt-icon-rect { border-color: var(--accent); }
 
   .fmt-ratio {
     font-family: var(--font-mono);
@@ -586,28 +696,10 @@
     <div class="comparator">
 
       <div class="sidebar">
-        <section class="spec-sheet" data-spec-sheet>
-          <div class="spec-stats">
-            <dl>
-              <div>
-                <dt>Aspect ratio</dt>
-                <dd data-stat-ratio>1.43:1</dd>
-              </div>
-              <div>
-                <dt>Picture height retained</dt>
-                <dd data-stat-height>83%</dd>
-              </div>
-              <div>
-                <dt>Gauge</dt>
-                <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
-              </div>
-            </dl>
-          </div>
-          <div class="spec-copy">
-            <h2 data-spec-name>IMAX GT (15/70)</h2>
-            <p data-spec-desc></p>
-          </div>
-        </section>
+        <div class="sidebar-head">
+          <span class="sidebar-title">Formats</span>
+          <button type="button" class="info-btn" data-info-btn aria-label="Show details for the selected format">ⓘ</button>
+        </div>
 
         <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
           <!-- buttons injected by script -->
@@ -647,6 +739,32 @@
 
     </div>
 
+    <dialog class="info-modal" data-info-modal>
+      <button type="button" class="info-modal-close" data-info-close aria-label="Close">✕</button>
+      <section class="spec-sheet" data-spec-sheet>
+        <div class="spec-stats">
+          <dl>
+            <div>
+              <dt>Aspect ratio</dt>
+              <dd data-stat-ratio>1.43:1</dd>
+            </div>
+            <div>
+              <dt>Picture height retained</dt>
+              <dd data-stat-height>83%</dd>
+            </div>
+            <div>
+              <dt>Gauge</dt>
+              <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="spec-copy">
+          <h2 data-spec-name>IMAX GT (15/70)</h2>
+          <p data-spec-desc></p>
+        </div>
+      </section>
+    </dialog>
+
   </section>
 
   <section id="panelTest" class="panel" role="tabpanel" aria-labelledby="tabTestBtn" hidden>
@@ -671,32 +789,14 @@
     <div class="comparator">
 
       <div class="sidebar">
+        <div class="sidebar-head">
+          <span class="sidebar-title">Formats</span>
+          <button type="button" class="info-btn" data-info-btn aria-label="Show details for the selected format">ⓘ</button>
+        </div>
+
         <nav class="format-strip" role="radiogroup" aria-label="Film format" data-format-strip>
           <!-- buttons injected by script -->
         </nav>
-
-        <section class="spec-sheet" data-spec-sheet>
-          <div class="spec-stats">
-            <dl>
-              <div>
-                <dt>Aspect ratio</dt>
-                <dd data-stat-ratio>1.43:1</dd>
-              </div>
-              <div>
-                <dt>Picture height retained</dt>
-                <dd data-stat-height>83%</dd>
-              </div>
-              <div>
-                <dt>Gauge</dt>
-                <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
-              </div>
-            </dl>
-          </div>
-          <div class="spec-copy">
-            <h2 data-spec-name>IMAX GT (15/70)</h2>
-            <p data-spec-desc></p>
-          </div>
-        </section>
       </div>
 
       <div class="viewer">
@@ -726,6 +826,32 @@
       </div>
 
     </div>
+
+    <dialog class="info-modal" data-info-modal>
+      <button type="button" class="info-modal-close" data-info-close aria-label="Close">✕</button>
+      <section class="spec-sheet" data-spec-sheet>
+        <div class="spec-stats">
+          <dl>
+            <div>
+              <dt>Aspect ratio</dt>
+              <dd data-stat-ratio>1.43:1</dd>
+            </div>
+            <div>
+              <dt>Picture height retained</dt>
+              <dd data-stat-height>83%</dd>
+            </div>
+            <div>
+              <dt>Gauge</dt>
+              <dd class="small" data-stat-gauge>65mm negative · 15-perf</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="spec-copy">
+          <h2 data-spec-name>IMAX GT (15/70)</h2>
+          <p data-spec-desc></p>
+        </div>
+      </section>
+    </dialog>
 
   </section>
 
@@ -877,15 +1003,39 @@
         btn.setAttribute("tabindex", isDefault ? "0" : "-1");
         btn.dataset.id = f.id;
 
+        // Frame-outline icon sized to this format's real aspect ratio (original artwork,
+        // not a brand logo) - fit to a 28x22 box, maximizing whichever dimension binds first.
+        var boxW = 28, boxH = 22;
+        var iconW, iconH;
+        if (f.ratio >= boxW / boxH) {
+          iconW = boxW;
+          iconH = boxW / f.ratio;
+        } else {
+          iconH = boxH;
+          iconW = boxH * f.ratio;
+        }
+        var iconEl = document.createElement("span");
+        iconEl.className = "fmt-icon";
+        var iconRect = document.createElement("span");
+        iconRect.className = "fmt-icon-rect";
+        iconRect.style.width = iconW.toFixed(1) + "px";
+        iconRect.style.height = iconH.toFixed(1) + "px";
+        iconEl.appendChild(iconRect);
+
         var ratioEl = document.createElement("span");
         ratioEl.className = "fmt-ratio";
         ratioEl.textContent = f.ratio.toFixed(2) + ":1";
+
+        var leftEl = document.createElement("span");
+        leftEl.className = "fmt-left";
+        leftEl.appendChild(iconEl);
+        leftEl.appendChild(ratioEl);
 
         var nameEl = document.createElement("span");
         nameEl.className = "fmt-name";
         nameEl.textContent = f.short;
 
-        btn.appendChild(ratioEl);
+        btn.appendChild(leftEl);
         btn.appendChild(nameEl);
         btn.addEventListener("click", function () { select(f.id, btn); });
         btn.addEventListener("keydown", onStripKeydown);
@@ -1155,6 +1305,24 @@
       ytLoadBtn.click();
     }
   });
+
+  // ---- info modal: format details on demand instead of always taking sidebar space ----
+
+  function wireInfoModal(root) {
+    var btn = root.querySelector("[data-info-btn]");
+    var modal = root.querySelector("[data-info-modal]");
+    var closeBtn = root.querySelector("[data-info-close]");
+    if (!btn || !modal) return;
+
+    btn.addEventListener("click", function () { modal.showModal(); });
+    closeBtn.addEventListener("click", function () { modal.close(); });
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) modal.close();
+    });
+  }
+
+  wireInfoModal(exploreRoot);
+  wireInfoModal(testRoot);
 
   buildSceneStrip();
   buildGrainTiles();
