@@ -86,6 +86,40 @@
     margin: 0;
   }
 
+  /* ---------- scene strip ---------- */
+
+  .scene-strip {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .scene-btn {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    background: var(--bg-raised);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .scene-btn:hover { color: var(--ink); }
+
+  .scene-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .scene-btn[aria-checked="true"] {
+    color: var(--accent);
+    border-color: var(--accent-dim);
+  }
+
   /* ---------- stage ---------- */
 
   .stage-wrap {
@@ -406,12 +440,18 @@
     </p>
   </header>
 
+  <div class="scene-strip" role="radiogroup" aria-label="Reference footage" id="sceneStrip">
+    <!-- buttons injected by script -->
+  </div>
+
   <section class="stage-wrap" aria-label="Format comparison viewer">
     <div class="rail" aria-hidden="true"></div>
 
     <div class="stage" id="stage" style="--ratio: 1.43;">
-      <!-- Aerial ocean-cliffs footage by Tom Fisk, via Pexels (pexels.com/video/36521503),
-           trimmed/compressed for web. Pexels License: free to use, no attribution required. -->
+      <!-- Reference footage, both via Pexels (free to use, no attribution required):
+           Ocean/cliffs by Tom Fisk (pexels.com/video/36521503),
+           Dolomites by Zlatin Georgiev (pexels.com/video/15708456).
+           Both trimmed to 8s and compressed for web. -->
       <video id="scene" muted loop playsinline preload="auto" aria-hidden="true">
         <source src="ocean.mp4" type="video/mp4" />
       </video>
@@ -570,11 +610,18 @@
     }
   ];
 
+  var SCENES = [
+    { id: "ocean", label: "Ocean · Cliffs", src: "ocean.mp4" },
+    { id: "dolomites", label: "Dolomites", src: "dolomites.mp4" }
+  ];
+  var DEFAULT_SCENE_ID = "ocean";
+
   var DEFAULT_ID = "imax-gt"; // what the IRMAX app itself shoots — kept as the default tab even though it's no longer the tallest entry
   var FULL_RATIO = Math.min.apply(null, FORMATS.map(function (f) { return f.ratio; }));
 
   var stage = document.getElementById("stage");
   var strip = document.getElementById("formatStrip");
+  var sceneStrip = document.getElementById("sceneStrip");
   var specSheet = document.getElementById("specSheet");
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var frameBase = 4821;
@@ -670,9 +717,41 @@
   }
 
   // ---- reference footage playback ----
-  // Real aerial ocean footage (see credit comment near the <video> tag) makes exactly how
-  // much of the picture each ratio keeps or trims immediately legible — muted/looped/inline
-  // so it behaves as ambient background, and left unplayed for reduced-motion users.
+  // Real footage (see credit comment near the <video> tag) makes exactly how much of the
+  // picture each ratio keeps or trims immediately legible — muted/looped/inline so it behaves
+  // as ambient background, and left unplayed for reduced-motion users. Two clips are offered
+  // since a horizon-heavy scene (mountains) and a texture-heavy one (cliffs/water) show the
+  // crop tradeoff differently.
+
+  function buildSceneStrip() {
+    SCENES.forEach(function (s) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "scene-btn";
+      var isDefault = s.id === DEFAULT_SCENE_ID;
+      btn.setAttribute("role", "radio");
+      btn.setAttribute("aria-checked", isDefault ? "true" : "false");
+      btn.textContent = s.label;
+      btn.addEventListener("click", function () { selectScene(s.id, btn); });
+      sceneStrip.appendChild(btn);
+    });
+  }
+
+  function selectScene(id, btnEl) {
+    var s = SCENES.filter(function (x) { return x.id === id; })[0];
+    if (!s) return;
+
+    Array.prototype.forEach.call(sceneStrip.querySelectorAll(".scene-btn"), function (b) {
+      b.setAttribute("aria-checked", b === btnEl ? "true" : "false");
+    });
+
+    var video = document.getElementById("scene");
+    video.querySelector("source").src = s.src;
+    video.load();
+    if (!reduceMotion) {
+      video.play().catch(function () { /* autoplay can be blocked; static first frame is fine */ });
+    }
+  }
 
   function startScene() {
     var video = document.getElementById("scene");
@@ -696,6 +775,7 @@
   }
 
   buildStrip();
+  buildSceneStrip();
   startScene();
   buildGrainTile();
   select(DEFAULT_ID, strip.querySelector('.fmt-btn[data-id="' + DEFAULT_ID + '"]'));
