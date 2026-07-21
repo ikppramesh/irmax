@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<title>Explore Premium Formats — IRMAX</title>
+<style>
+  /*
+    Deliberately single-theme (dark). A projection booth doesn't have a light
+    mode — the metaphor this page runs on (an aperture plate masking a lit
+    negative in a dark room) only reads correctly against black.
+  */
+  :root {
+    --bg: #0b0a08;
+    --bg-raised: #16130f;
+    --mask: #050403;
+    --ink: #f3ede0;
+    --ink-dim: #9c9284;
+    --ink-faint: #665e50;
+    --rule: #2b261e;
+    --accent: #e8a63c;
+    --accent-dim: #7a5a22;
+
+    --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-serif: ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-serif);
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: clamp(28px, 6vw, 64px) clamp(18px, 4vw, 32px) 72px;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { margin-bottom: clamp(28px, 5vw, 44px); }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.8125rem;
+    letter-spacing: 0.28em;
+    color: var(--accent);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 18px 0 10px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.9rem, 1.35rem + 2.2vw, 2.9rem);
+    letter-spacing: -0.01em;
+    line-height: 1.08;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-size: 1.0625rem;
+    color: var(--ink-dim);
+    max-width: 58ch;
+    margin: 0;
+  }
+
+  /* ---------- stage ---------- */
+
+  .stage-wrap {
+    display: grid;
+    grid-template-columns: 14px 1fr 14px;
+    gap: 10px;
+    align-items: stretch;
+    margin-top: clamp(28px, 5vw, 40px);
+  }
+
+  .sprocket {
+    background-image: repeating-radial-gradient(
+      circle at 50% 7px,
+      var(--rule) 0 3px,
+      transparent 3.5px 22px
+    );
+    background-color: var(--bg-raised);
+    border-radius: 2px;
+  }
+
+  .stage {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1.43;
+    background: var(--mask);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+
+  .stage canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .stage::after {
+    /* soft projector hot-spot */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 60%, transparent 45%, rgba(0,0,0,0.35) 100%);
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .crop-frame {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    width: 100%;
+    aspect-ratio: var(--ratio, 1.43);
+    transform: translateY(-50%);
+    border: 1px solid rgba(243, 237, 224, 0.55);
+    box-shadow: 0 0 0 9999px var(--mask);
+    transition: aspect-ratio 0.6s cubic-bezier(0.22, 0.7, 0.2, 1);
+    z-index: 2;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .crop-frame { transition: none; }
+  }
+
+  .grain {
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: overlay;
+    opacity: 0.4;
+    background-repeat: repeat;
+    background-size: 96px 96px;
+    animation: grain-flicker 0.6s steps(4) infinite;
+  }
+
+  @keyframes grain-flicker {
+    0%   { background-position: 0 0; }
+    25%  { background-position: 17px -23px; }
+    50%  { background-position: -11px 14px; }
+    75%  { background-position: 9px 8px; }
+    100% { background-position: 0 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grain { animation: none; }
+  }
+
+  .edge-code {
+    position: absolute;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    color: rgba(243, 237, 224, 0.8);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    white-space: nowrap;
+  }
+  .edge-code.tl { top: 8px; left: 10px; }
+  .edge-code.tr { top: 8px; right: 10px; color: var(--accent); font-weight: 600; }
+  .edge-code.bl { bottom: 8px; left: 10px; }
+  .edge-code.br { bottom: 8px; right: 10px; font-variant-numeric: tabular-nums; }
+
+  /* ---------- format strip ---------- */
+
+  .format-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: 18px;
+    background: var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .fmt-btn {
+    flex: 1 1 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--bg-raised);
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--ink-dim);
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  }
+
+  .fmt-btn:hover { background: #1c1812; color: var(--ink); }
+
+  .fmt-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .fmt-btn[aria-checked="true"] {
+    background: #1c1812;
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+
+  .fmt-ratio {
+    font-family: var(--font-mono);
+    font-size: 1.1875rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+  }
+  .fmt-btn[aria-checked="true"] .fmt-ratio { color: var(--accent); }
+
+  .fmt-name {
+    font-family: var(--font-display);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- spec sheet ---------- */
+
+  .spec-sheet {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    gap: 32px;
+    margin-top: 34px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+    transition: opacity 0.15s ease;
+  }
+
+  .spec-sheet.swapping { opacity: 0; }
+
+  @media (max-width: 640px) {
+    .spec-sheet { grid-template-columns: 1fr; gap: 20px; }
+  }
+
+  .spec-stats dl { margin: 0; display: flex; flex-direction: column; gap: 16px; }
+  .spec-stats div + div { padding-top: 16px; border-top: 1px solid var(--rule); }
+  .spec-stats dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 4px;
+  }
+  .spec-stats dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 1.375rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .spec-stats dd.small {
+    font-family: var(--font-serif);
+    font-size: 0.9375rem;
+    font-weight: 400;
+    color: var(--ink-dim);
+  }
+
+  .spec-copy h2 {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 800;
+    margin: 0 0 10px;
+    text-wrap: balance;
+  }
+  .spec-copy p {
+    margin: 0;
+    color: var(--ink-dim);
+    max-width: 60ch;
+  }
+
+  /* ---------- footer ---------- */
+
+  .foot {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-size: 0.9rem;
+    color: var(--ink-faint);
+  }
+  .foot a { color: var(--accent); text-decoration: none; }
+  .foot a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="wordmark">IRMAX</div>
+    <p class="eyebrow">Format comparison · reference reel</p>
+    <h1>Explore Premium Formats</h1>
+    <p class="lede">
+      One full-frame negative, cropped five different ways. Select a format to see how
+      much of the picture survives the trim — and why IMAX's own 1.43:1 frame is the
+      tallest starting point in the room.
+    </p>
+  </header>
+
+  <section class="stage-wrap" aria-label="Format comparison viewer">
+    <div class="sprocket" aria-hidden="true"></div>
+
+    <div class="stage" id="stage" style="--ratio: 1.43;">
+      <canvas id="scene" width="1600" height="1119" aria-hidden="true"></canvas>
+      <div class="crop-frame" id="cropFrame">
+        <span class="edge-code tl">IRMAX · REF</span>
+        <span class="edge-code tr" id="edgeRatio">1.43:1</span>
+        <span class="edge-code bl" id="edgeFormat">IMAX GT · 15/70</span>
+        <span class="edge-code br" id="edgeFrame">FRAME 004821</span>
+        <div class="grain" id="grain" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="sprocket" aria-hidden="true"></div>
+  </section>
+
+  <nav class="format-strip" role="radiogroup" aria-label="Film format" id="formatStrip">
+    <!-- buttons injected by script -->
+  </nav>
+
+  <section class="spec-sheet" id="specSheet">
+    <div class="spec-stats">
+      <dl>
+        <div>
+          <dt>Aspect ratio</dt>
+          <dd id="statRatio">1.43:1</dd>
+        </div>
+        <div>
+          <dt>Picture height retained</dt>
+          <dd id="statHeight">100%</dd>
+        </div>
+        <div>
+          <dt>Gauge</dt>
+          <dd class="small" id="statGauge">65mm negative · 15-perf</dd>
+        </div>
+      </dl>
+    </div>
+    <div class="spec-copy">
+      <h2 id="specName">IMAX GT (15/70)</h2>
+      <p id="specDesc"></p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>
+      The IRMAX Android app frames and crops live for <strong>1.43:1</strong> and
+      <strong>1.90:1</strong> in the viewfinder — <a href="../README.md">see the app →</a>
+    </p>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var FORMATS = [
+    {
+      id: "imax-gt",
+      ratio: 1.43,
+      name: "IMAX GT (15/70)",
+      short: "IMAX GT",
+      gauge: "65mm negative · 15-perf",
+      desc: "The full IMAX negative — 65mm film running horizontally through the camera at 15 perforations per frame. The largest and highest-resolution photochemical format ever used in commercial cinema, reserved for a small number of purpose-built GT screens worldwide."
+    },
+    {
+      id: "imax-digital",
+      ratio: 1.90,
+      name: "IMAX Digital",
+      short: "IMAX Digital",
+      gauge: "Digital master",
+      desc: "IMAX's contemporary digital master, cropped to fill IMAX's digital projection screens edge to edge. Shorter than the full-film GT frame, but still noticeably taller than a standard multiplex screen."
+    },
+    {
+      id: "70mm",
+      ratio: 2.20,
+      name: "70mm (5-perf)",
+      short: "70mm",
+      gauge: "65mm negative · 5-perf",
+      desc: "A large-format 65mm negative shot at 5 perforations per frame — the roadshow format behind widescreen epics from Lawrence of Arabia to The Hateful Eight, prized for its clarity and scale without requiring a purpose-built IMAX auditorium."
+    },
+    {
+      id: "35mm-flat",
+      ratio: 1.85,
+      name: "35mm Flat",
+      short: "35mm Flat",
+      gauge: "35mm negative · 4-perf, spherical",
+      desc: "The default US theatrical ratio. Shot spherically on standard 4-perforation 35mm and matted top and bottom in the projector — the frame most films are still finished for today."
+    },
+    {
+      id: "35mm-scope",
+      ratio: 2.39,
+      name: "35mm Scope",
+      short: "35mm Scope",
+      gauge: "35mm negative · 4-perf, anamorphic 2×",
+      desc: "A standard 35mm frame shot through an anamorphic lens that squeezes a wide field of view horizontally onto the negative, then unsqueezes it again in projection — the format behind the widest, most “cinematic” theatrical image."
+    }
+  ];
+
+  var FULL_RATIO = FORMATS[0].ratio; // IMAX GT — the tallest frame, everything else crops down from it
+
+  var stage = document.getElementById("stage");
+  var strip = document.getElementById("formatStrip");
+  var specSheet = document.getElementById("specSheet");
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var frameBase = 4821;
+  var frameCounters = {};
+
+  FORMATS.forEach(function (f, i) { frameCounters[f.id] = frameBase + i * 137; });
+
+  function buildStrip() {
+    FORMATS.forEach(function (f, i) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "fmt-btn";
+      btn.setAttribute("role", "radio");
+      btn.setAttribute("aria-checked", i === 0 ? "true" : "false");
+      btn.setAttribute("tabindex", i === 0 ? "0" : "-1");
+      btn.dataset.id = f.id;
+
+      var ratioEl = document.createElement("span");
+      ratioEl.className = "fmt-ratio";
+      ratioEl.textContent = f.ratio.toFixed(2) + ":1";
+
+      var nameEl = document.createElement("span");
+      nameEl.className = "fmt-name";
+      nameEl.textContent = f.short;
+
+      btn.appendChild(ratioEl);
+      btn.appendChild(nameEl);
+      btn.addEventListener("click", function () { select(f.id, btn); });
+      btn.addEventListener("keydown", onStripKeydown);
+
+      strip.appendChild(btn);
+    });
+  }
+
+  function onStripKeydown(e) {
+    var buttons = Array.prototype.slice.call(strip.querySelectorAll(".fmt-btn"));
+    var idx = buttons.indexOf(e.currentTarget);
+    var next = null;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = buttons[(idx + 1) % buttons.length];
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = buttons[(idx - 1 + buttons.length) % buttons.length];
+    if (next) {
+      e.preventDefault();
+      next.focus();
+      select(next.dataset.id, next);
+    }
+  }
+
+  function select(id, btnEl) {
+    var f = FORMATS.filter(function (x) { return x.id === id; })[0];
+    if (!f) return;
+
+    Array.prototype.forEach.call(strip.querySelectorAll(".fmt-btn"), function (b) {
+      var checked = b === btnEl;
+      b.setAttribute("aria-checked", checked ? "true" : "false");
+      b.setAttribute("tabindex", checked ? "0" : "-1");
+    });
+
+    stage.style.setProperty("--ratio", f.ratio);
+    document.getElementById("edgeRatio").textContent = f.ratio.toFixed(2) + ":1";
+    document.getElementById("edgeFormat").textContent = f.short + " · " + f.gauge.split(" · ")[0];
+    document.getElementById("edgeFrame").textContent = "FRAME " + String(frameCounters[id]).padStart(6, "0");
+
+    var swap = function () {
+      document.getElementById("statRatio").textContent = f.ratio.toFixed(2) + ":1";
+      document.getElementById("statHeight").textContent = Math.round((FULL_RATIO / f.ratio) * 100) + "%";
+      document.getElementById("statGauge").textContent = f.gauge;
+      document.getElementById("specName").textContent = f.name;
+      document.getElementById("specDesc").textContent = f.desc;
+    };
+
+    if (reduceMotion) {
+      swap();
+    } else {
+      specSheet.classList.add("swapping");
+      window.setTimeout(function () {
+        swap();
+        specSheet.classList.remove("swapping");
+      }, 150);
+    }
+  }
+
+  function tickFrames() {
+    if (reduceMotion) return;
+    window.setInterval(function () {
+      FORMATS.forEach(function (f) { frameCounters[f.id]++; });
+      var checked = strip.querySelector('.fmt-btn[aria-checked="true"]');
+      if (checked) {
+        document.getElementById("edgeFrame").textContent =
+          "FRAME " + String(frameCounters[checked.dataset.id]).padStart(6, "0");
+      }
+    }, 2000);
+  }
+
+  // ---- procedural reference scene (dusk ridge line, drawn once) ----
+
+  function drawScene() {
+    var canvas = document.getElementById("scene");
+    var ctx = canvas.getContext("2d");
+    var w = canvas.width, h = canvas.height;
+
+    var sky = ctx.createLinearGradient(0, 0, 0, h);
+    sky.addColorStop(0, "#0a0806");
+    sky.addColorStop(0.55, "#241407");
+    sky.addColorStop(0.72, "#7a3d12");
+    sky.addColorStop(0.84, "#c97a2e");
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, w, h);
+
+    var sunY = h * 0.74;
+    var glow = ctx.createRadialGradient(w * 0.5, sunY, 0, w * 0.5, sunY, w * 0.28);
+    glow.addColorStop(0, "rgba(255, 214, 140, 0.9)");
+    glow.addColorStop(0.35, "rgba(232, 166, 60, 0.35)");
+    glow.addColorStop(1, "rgba(232, 166, 60, 0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, w, h);
+
+    function ridge(baseY, amp, seed, color) {
+      ctx.beginPath();
+      ctx.moveTo(0, h);
+      ctx.lineTo(0, baseY);
+      var steps = 24;
+      for (var i = 0; i <= steps; i++) {
+        var x = (w / steps) * i;
+        var n = Math.sin(i * 0.7 + seed) * 0.6 + Math.sin(i * 1.9 + seed * 2.1) * 0.4;
+        var y = baseY - n * amp;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(w, h);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    ridge(h * 0.78, h * 0.05, 1.3, "#2a180c");
+    ridge(h * 0.86, h * 0.045, 4.1, "#170e08");
+    ridge(h * 0.93, h * 0.035, 7.8, "#0b0705");
+
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
+    ctx.fillRect(0, h * 0.9, w, h * 0.1);
+  }
+
+  function buildGrainTile() {
+    var size = 96;
+    var c = document.createElement("canvas");
+    c.width = size; c.height = size;
+    var ctx = c.getContext("2d");
+    var img = ctx.createImageData(size, size);
+    for (var i = 0; i < img.data.length; i += 4) {
+      var v = Math.random() * 255;
+      img.data[i] = v; img.data[i + 1] = v; img.data[i + 2] = v;
+      img.data[i + 3] = Math.random() * 40;
+    }
+    ctx.putImageData(img, 0, 0);
+    document.getElementById("grain").style.backgroundImage = "url(" + c.toDataURL() + ")";
+  }
+
+  buildStrip();
+  drawScene();
+  buildGrainTile();
+  document.getElementById("specDesc").textContent = FORMATS[0].desc;
+  tickFrames();
+})();
+</script>
+
+</body>
+</html>
